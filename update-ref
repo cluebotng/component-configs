@@ -1,0 +1,25 @@
+#!/bin/bash
+tool_name=$1
+component=$2
+ref=$3
+
+if [ -z "${tool_name}" ] || [ -z "${component}" ] || [ -z "${ref}" ];
+then
+  echo "$0 <tool user> <component name> <ref>"
+  exit 1
+fi
+
+if [ ! -f "${tool_name}.yaml" ];
+then
+  echo "${tool_name} not found"
+  exit 1
+fi
+
+if [ "$(yq .components.${component} < ${tool_name}.yaml)" == "null" ];
+then
+  echo "${component} not found in ${tool_name}"
+  exit 1
+fi
+
+echo "Updating ${tool_name}/${component} to ${ref}"
+yq e -i ".components.${component}.build.ref = \"${ref}\"" "${tool_name}.yaml"

@@ -1,0 +1,14 @@
+source_url: https://raw.githubusercontent.com/cluebotng/bot/refs/heads/main/cluebotng-staging.yaml
+components:
+  bot:
+    build:
+      repository: https://github.com/cluebotng/botng
+      ref: v0.0.34
+    run:
+      command: botng --irc-relay --debug
+      cpu: "0.5"
+      memory: 1Gi
+      port: 8118
+      health-check-http: /health
+      replicas: 1
+      mount: none
