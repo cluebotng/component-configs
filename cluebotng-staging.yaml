@@ -3,7 +3,7 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/botng
-      ref: v0.0.34
+      ref: refs/heads/feature/use-deployments
     run:
       command: botng --irc-relay --debug
       cpu: "0.5"
