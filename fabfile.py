@@ -4,7 +4,7 @@ from typing import List
 from fabric import Connection, Config, task
 
 
-CONFIG_BASE_URL = "https://raw.githubusercontent.com/cluebotng/bot/refs/heads/main"
+CONFIG_BASE_URL = "https://raw.githubusercontent.com/cluebotng/component-configs/refs/heads/main"
 TOOL_BASE_DIR = PosixPath("/data/project")
 
 
@@ -42,7 +42,7 @@ def _has_no_component_configs(tool_name: str):
 
 def _setup_component_configs(tool_name: str):
     config_url = f'{CONFIG_BASE_URL.rstrip("/")}/{tool_name}.yaml'
-    print(f'Applying to {tool_name}: {config_url}')
+    print(f'[{tool_name}] applying {config_url}')
 
     c = Connection(
         "login.toolforge.org",
@@ -53,8 +53,8 @@ def _setup_component_configs(tool_name: str):
         ),
     )
     c.sudo(
-        f"curl --fail {config_url} | "
-        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components config create",
+        f"bash -c 'curl -s --fail {config_url} | "
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components config create'",
     )
 
 
@@ -62,6 +62,9 @@ def _setup_component_configs(tool_name: str):
 def setup(_ctx):
     """Ensure the tool accounts have component configs setup."""
     for tool_name in _get_target_tools():
-        print(f'Checking {tool_name}')
+        print(f'[{tool_name}] checking for component config')
         if _has_no_component_configs(tool_name):
+            print(f'[{tool_name}] no component config')
             _setup_component_configs(tool_name)
+        else:
+            print(f'[{tool_name}] component config already exists')

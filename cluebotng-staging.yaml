@@ -1,4 +1,4 @@
-source_url: https://raw.githubusercontent.com/cluebotng/bot/refs/heads/main/cluebotng-staging.yaml
+source_url: https://raw.githubusercontent.com/cluebotng/component-configs/refs/heads/main/cluebotng-staging.yaml
 components:
   bot:
     build:
