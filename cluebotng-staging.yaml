@@ -2,7 +2,7 @@ source_url: https://raw.githubusercontent.com/cluebotng/component-configs/refs/h
 components:
   bot:
     build:
-      repository: https://github.com/cluebotng/botng
+      repository: https://github.com/cluebotng/botng.git
       ref: v0.0.39
       use_latest_versions: true
     run:
@@ -11,5 +11,26 @@ components:
       memory: 1Gi
       port: 8118
       health-check-http: /health
-      replicas: 1
-      mount: none
+
+  core:
+    build:
+      repository: https://github.com/cluebotng/external-core.git
+      ref: v0.0.1
+      use_latest_versions: true
+    run:
+      command: ./cluebotng -l -m live_run
+      cpu: "0.5"
+      mem: 0.5Gi
+      port: 3565
+
+  grafana-alloy:
+    build:
+      repository: https://github.com/cluebotng/external-grafana-alloy.git
+      ref: v0.0.1
+      use_latest_versions: true
+    run:
+      command: run-alloy
+      cpu: '0.5'
+      memory: 0.5Gi
+      port: 8118
+      health-check-http: /health
