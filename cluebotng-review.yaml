@@ -16,7 +16,6 @@ components:
       port: 8000
       replicas: 4
       health_check_http: /internal/health/
-
   celery-worker:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -30,12 +29,11 @@ components:
       memory: 0.5Gi
       mount: none
       replicas: 1
-
   # Helper services
   irc-relay:
     build:
       repository: https://github.com/cluebotng/irc_relay.git
-      ref: v1.1.9
+      ref: refs/tags/v1.1.12
       use_latest_versions: true
     run:
       command: run-relay
@@ -46,7 +44,6 @@ components:
       mount: none
       port: 3334
       replicas: 1
-
   # Scheduled jobs
 
   ## Core jobs
@@ -64,7 +61,6 @@ components:
       mount: none
       retry: 0
       schedule: 13 9 * * *
-
   update-edit-classifications:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -79,7 +75,6 @@ components:
       mount: none
       retry: 0
       schedule: 30 */2 * * *
-
   ## Seed jobs
   add-reported-edits:
     build:
@@ -95,7 +90,6 @@ components:
       mount: none
       retry: 0
       schedule: 55 * * * *
-
   add-edits-to-queue:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -110,7 +104,6 @@ components:
       mount: none
       retry: 0
       schedule: 13 6 * * *
-
   ## Helper jobs
   add-reviews-from-report:
     build:
@@ -126,7 +119,6 @@ components:
       mount: none
       retry: 0
       schedule: 15 * * * *
-
   add-reviews-from-huggle:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -141,7 +133,6 @@ components:
       mount: none
       retry: 0
       schedule: 23 */2 * * *
-
   ## Back-fill jobs
   import-training-data:
     build:
@@ -157,7 +148,6 @@ components:
       mount: none
       retry: 0
       schedule: 15 2 * * *
-
   mark-edits-as-deleted:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -172,7 +162,6 @@ components:
       mount: none
       retry: 0
       schedule: 13 4 * * *
-
   mark-edits-as-having-data:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -187,7 +176,6 @@ components:
       mount: none
       retry: 0
       schedule: 13 3 * * *
-
   add-dangling-edits-to-group:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -202,7 +190,6 @@ components:
       mount: none
       retry: 0
       schedule: 13 21 * * *
-
   ## Management jobs
   cleanup-user-records:
     build:
@@ -218,7 +205,6 @@ components:
       mount: none
       retry: 0
       schedule: 13 1 * * *
-
   grant-review-access-from-wikipedia-rights:
     build:
       repository: https://github.com/cluebotng/reviewer.git
