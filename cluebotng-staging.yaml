@@ -24,7 +24,7 @@ components:
   grafana-alloy:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
-      ref: refs/tags/v0.0.4
+      ref: refs/tags/v0.1.0
       use_latest_versions: true
     run:
       command: run-alloy
