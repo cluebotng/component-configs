@@ -9,23 +9,49 @@ then
   exit 1
 fi
 
-if [ ! -f "${tool_name}.yaml" ];
+tools=""
+if [ "${tool_name}" == "*" ]
 then
-  echo "${tool_name} not found"
+  for tool in *.yaml;
+  do
+    tools="${tools} $(sed 's/\.yaml$//' <<< "${tool}")"
+  done
+else
+  if [ -f "${tool_name}.yaml" ]
+  then
+    tools="${tools} ${tool_name}"
+  fi
+fi
+
+if [ -z "${tools}" ];
+then
+  echo "No tools found not found for '${tool_name}'"
   exit 1
 fi
 
-# Find all components matching the specified repository
-components=$(yq '.components | . as $data | keys[] | select($data[.].build.repository == "'${repository}'") | .' < ${tool_name}.yaml)
-
-if [ -z "${components}" ];
-then
-  echo "No components not found in ${tool_name}"
-  exit 1
-fi
-
-# Use `update-ref` to do the (per component) updating
-for component in ${components};
+echo "Resolved '${tool_name}' into ${tools}"
+for tool in ${tools};
 do
-  ./update-ref "${tool_name}" "${component}" "${ref}"
+
+  # Find all components matching the specified repository
+  components=$(yq '.components | . as $data | keys[] | select($data[.].build.repository == "'${repository}'") | .' < ${tool}.yaml)
+
+  if [ -z "${components}" ];
+  then
+    # If we specified an explicit tool, then abort on no components
+    if [ "${tool_name}" != "*" ];
+    then
+      echo "No components not found in ${tool}"
+      exit 1
+    fi
+
+    # Otherwise, just ignore a tool with no components matching this repo
+    continue
+  fi
+
+  # Use `update-ref` to do the (per component) updating
+  for component in ${components};
+  do
+    echo ./update-ref "${tool}" "${component}" "${ref}"
+  done
 done
