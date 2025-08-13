@@ -1,0 +1,11 @@
+name: 'Trigger deploy for cluebotng-review'
+on: { push: { branches: [ main ], paths: [ 'cluebotng-review.yaml' ] } }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: 'cluebotng-review'
+    steps:
+      - uses: cluebotng/ci-toolforge-deploy@main
+        with:
+          tool: 'cluebotng-review'
+          token: ${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}

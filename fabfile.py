@@ -58,6 +58,31 @@ def _setup_component_configs(tool_name: str):
     )
 
 
+def _generate_workflow(tool_name: str):
+    # We do this to avoid `yaml` as a dep, it's simple enough
+    config = f'name: \'Trigger deploy for {tool_name}\'\n'
+    config += f'on: {{ push: {{ branches: [ main ], paths: [ \'{tool_name}.yaml\' ] }} }}\n'
+    config += 'jobs:\n'
+    config += '  deploy:\n'
+    config += '    runs-on: ubuntu-latest\n'
+    config += f'    environment: \'{tool_name}\'\n'
+    config += '    steps:\n'
+    config += '      - uses: cluebotng/ci-toolforge-deploy@main\n'
+    config += '        with:\n'
+    config += f'          tool: \'{tool_name}\'\n'
+    config += '          token: \'${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}\'\n'
+    return config
+
+
+@task()
+def create_workflows(_ctx):
+    """Generate Github workflows for each tool"""
+    for tool_name in _get_target_tools():
+        workflow_file = PosixPath(__file__).parent / ".github" / "workflows" / f"{tool_name}.yaml"
+        with workflow_file.open('w') as fh:
+            fh.write(_generate_workflow(tool_name))
+
+
 @task()
 def setup(_ctx):
     """Ensure the tool accounts have component configs setup."""
