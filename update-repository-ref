@@ -52,6 +52,6 @@ do
   # Use `update-ref` to do the (per component) updating
   for component in ${components};
   do
-    echo ./update-ref "${tool}" "${component}" "${ref}"
+    ./update-ref "${tool}" "${component}" "${ref}"
   done
 done
