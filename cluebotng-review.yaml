@@ -13,7 +13,6 @@ components:
       port: 8000
       replicas: 4
       health_check_http: /internal/health/
-
   celery-worker:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -24,7 +23,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       replicas: 1
-
   # Helper services
   irc-relay:
     build:
@@ -36,11 +34,10 @@ components:
       cpu: '0.5'
       memory: 1.0Gi
       port: 3334
-
   grafana-alloy:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
-      ref: v0.0.1
+      ref: refs/tags/v0.0.2
       use_latest_versions: true
     run:
       command: run-alloy
@@ -48,7 +45,6 @@ components:
       memory: 0.5Gi
       port: 8118
       health-check-http: /health
-
   # Scheduled jobs
 
   ## Core jobs
@@ -62,7 +58,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 13 9 * * *
-
   update-edit-classifications:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -73,7 +68,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 30 */2 * * *
-
   ## Seed jobs
   add-reported-edits:
     build:
@@ -85,7 +79,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 55 * * * *
-
   add-edits-to-queue:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -96,7 +89,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 13 6 * * *
-
   ## Helper jobs
   add-reviews-from-report:
     build:
@@ -108,7 +100,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 15 * * * *
-
   add-reviews-from-huggle:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -119,7 +110,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 23 */2 * * *
-
   ## Back-fill jobs
   import-training-data:
     build:
@@ -131,7 +121,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 15 2 * * *
-
   mark-edits-as-deleted:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -142,7 +131,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 13 4 * * *
-
   mark-edits-as-having-data:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -153,7 +141,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 13 3 * * *
-
   add-dangling-edits-to-group:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -164,7 +151,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 13 21 * * *
-
   ## Management jobs
   cleanup-user-records:
     build:
@@ -176,7 +162,6 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       schedule: 13 1 * * *
-
   grant-review-access-from-wikipedia-rights:
     build:
       repository: https://github.com/cluebotng/reviewer.git
