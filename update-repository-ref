@@ -1,0 +1,31 @@
+#!/bin/bash
+tool_name=$1
+repository=$2
+ref=$3
+
+if [ -z "${tool_name}" ] || [ -z "${repository}" ] || [ -z "${ref}" ];
+then
+  echo "$0 <tool user> <repository url> <ref>"
+  exit 1
+fi
+
+if [ ! -f "${tool_name}.yaml" ];
+then
+  echo "${tool_name} not found"
+  exit 1
+fi
+
+# Find all components matching the specified repository
+components=$(yq '.components | . as $data | keys[] | select($data[.].build.repository == "'${repository}'") | .' < ${tool_name}.yaml)
+
+if [ -z "${components}" ];
+then
+  echo "No components not found in ${tool_name}"
+  exit 1
+fi
+
+# Use `update-ref` to do the (per component) updating
+for component in ${components};
+do
+  ./update-ref "${tool_name}" "${component}" "${ref}"
+done
