@@ -9,13 +9,11 @@ components:
     run:
       command: web
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
       port: 8000
       replicas: 4
       health_check_http: /internal/health/
+
   celery-worker:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -24,26 +22,33 @@ components:
     run:
       command: run-celery
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
       replicas: 1
+
   # Helper services
   irc-relay:
     build:
       repository: https://github.com/cluebotng/irc_relay.git
-      ref: refs/tags/v1.1.12
+      ref: v1.1.9
       use_latest_versions: true
     run:
       command: run-relay
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 1.0Gi
-      mount: none
       port: 3334
-      replicas: 1
+
+  grafana-alloy:
+    build:
+      repository: https://github.com/cluebotng/external-grafana-alloy.git
+      ref: v0.0.1
+      use_latest_versions: true
+    run:
+      command: run-alloy
+      cpu: '0.5'
+      memory: 0.5Gi
+      port: 8118
+      health-check-http: /health
+
   # Scheduled jobs
 
   ## Core jobs
@@ -55,12 +60,9 @@ components:
     run:
       command: ./manage.py export_statistics
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 13 9 * * *
+
   update-edit-classifications:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -69,12 +71,9 @@ components:
     run:
       command: ./manage.py update_edit_classification
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 30 */2 * * *
+
   ## Seed jobs
   add-reported-edits:
     build:
@@ -84,12 +83,9 @@ components:
     run:
       command: ./manage.py add_reported_edits
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 55 * * * *
+
   add-edits-to-queue:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -98,12 +94,9 @@ components:
     run:
       command: ./manage.py add_edits_to_queue
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 13 6 * * *
+
   ## Helper jobs
   add-reviews-from-report:
     build:
@@ -113,12 +106,9 @@ components:
     run:
       command: ./manage.py add_reviews_from_report
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 15 * * * *
+
   add-reviews-from-huggle:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -127,12 +117,9 @@ components:
     run:
       command: ./manage.py add_reviews_from_huggle
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 23 */2 * * *
+
   ## Back-fill jobs
   import-training-data:
     build:
@@ -142,12 +129,9 @@ components:
     run:
       command: ./manage.py import_training_data
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 15 2 * * *
+
   mark-edits-as-deleted:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -156,12 +140,9 @@ components:
     run:
       command: ./manage.py mark_edits_as_deleted
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 13 4 * * *
+
   mark-edits-as-having-data:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -170,12 +151,9 @@ components:
     run:
       command: ./manage.py mark_edits_with_training_data
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 13 3 * * *
+
   add-dangling-edits-to-group:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -184,12 +162,9 @@ components:
     run:
       command: ./manage.py add_dangling_edits_to_group
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 13 21 * * *
+
   ## Management jobs
   cleanup-user-records:
     build:
@@ -199,12 +174,9 @@ components:
     run:
       command: ./manage.py cleanup_user_records
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 13 1 * * *
+
   grant-review-access-from-wikipedia-rights:
     build:
       repository: https://github.com/cluebotng/reviewer.git
@@ -213,9 +185,5 @@ components:
     run:
       command: ./manage.py grant_review_access_from_rights
       cpu: '0.5'
-      emails: none
-      filelog: false
       memory: 0.5Gi
-      mount: none
-      retry: 0
       schedule: 27 * * * *
