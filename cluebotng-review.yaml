@@ -31,7 +31,7 @@ components:
   irc-relay:
     build:
       repository: https://github.com/cluebotng/irc_relay.git
-      ref: v1.1.9
+      ref: refs/tags/v1.1.12
     run:
       command: run-relay
       cpu: '0.5'
