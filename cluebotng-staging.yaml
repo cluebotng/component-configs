@@ -14,7 +14,7 @@ components:
   core:
     build:
       repository: https://github.com/cluebotng/external-core.git
-      ref: v0.0.1
+      ref: refs/tags/v0.0.2
       use_latest_versions: true
     run:
       command: ./cluebotng -l -m live_run
