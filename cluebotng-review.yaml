@@ -11,7 +11,7 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       port: 8000
-      replicas: 4
+      replicas: 2
       health_check_http: /internal/health/
   celery-worker:
     build:
@@ -23,6 +23,15 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       replicas: 1
+  # Runtime dependencies
+  redis:
+    build:
+      repository: https://gitlab.wikimedia.org/toolforge-repos/containers-redis.git
+      ref: main
+      use_latest_versions: true
+    run:
+      command: server
+      port: 6379
   # Helper services
   irc-relay:
     build:
@@ -34,6 +43,15 @@ components:
       cpu: '0.5'
       memory: 1.0Gi
       port: 3334
+  celery-flower:
+    build:
+      repository: https://github.com/cluebotng/reviewer.git
+      ref: v0.1.8
+      use_latest_versions: true
+    run:
+      command: run-flower
+      port: 5555
+      health_check_http: /healthcheck
   grafana-alloy:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
