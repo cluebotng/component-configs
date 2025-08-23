@@ -3,7 +3,7 @@ components:
   trainer:
     build:
       repository: https://github.com/cluebotng/trainer.git
-      ref: refs/tags/v1.0.2
+      ref: refs/tags/v1.0.3
       use_latest_versions: true
     run:
       schedule: '13 */6 * * *'
