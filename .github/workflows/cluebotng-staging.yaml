@@ -8,4 +8,4 @@ jobs:
       - uses: cluebotng/ci-toolforge-deploy@main
         with:
           tool: 'cluebotng-staging'
-          token: ${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}
+          token: '${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'
