@@ -4,7 +4,7 @@ from typing import List
 from fabric import Connection, Config, task
 
 
-CONFIG_BASE_URL = "https://api.github.com/repos/cluebotng/component-configs/contents"
+CONFIG_BASE_URL = "https://raw.githubusercontent.com/cluebotng/component-configs/refs/heads/main"
 TOOL_BASE_DIR = PosixPath("/data/project")
 
 
