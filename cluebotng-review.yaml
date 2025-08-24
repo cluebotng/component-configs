@@ -62,7 +62,7 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       port: 8118
-      health-check-http: /health
+      health_check_http: /health
   # Scheduled jobs
 
   ## Core jobs
