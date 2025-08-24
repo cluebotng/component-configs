@@ -15,31 +15,6 @@ def _get_target_tools() -> List[str]:
     ]
 
 
-def _has_no_component_configs(tool_name: str):
-    c = Connection(
-        "login.toolforge.org",
-        config=Config(
-            overrides={
-                "sudo": {"user": f"tools.{tool_name}", "prefix": "/usr/bin/sudo -ni"}
-            }
-        ),
-    )
-    resp = c.sudo(
-        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components config show",
-        hide=True,
-        warn=True,
-    )
-    return (
-        resp.exited == 1
-        and (
-            f"Error: Unable to find namespace tool-{tool_name} or "
-            f"config {tool_name}-config "
-            f"for {tool_name}"
-        )
-        in resp.stderr
-    )
-
-
 def _setup_component_configs(tool_name: str):
     config_url = f'{CONFIG_BASE_URL.rstrip("/")}/{tool_name}.yaml'
     print(f'[{tool_name}] applying {config_url}')
@@ -87,9 +62,4 @@ def create_workflows(_ctx):
 def setup(_ctx):
     """Ensure the tool accounts have component configs setup."""
     for tool_name in _get_target_tools():
-        print(f'[{tool_name}] checking for component config')
-        if _has_no_component_configs(tool_name):
-            print(f'[{tool_name}] no component config')
-            _setup_component_configs(tool_name)
-        else:
-            print(f'[{tool_name}] component config already exists')
+        _setup_component_configs(tool_name)
