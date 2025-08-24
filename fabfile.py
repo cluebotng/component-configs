@@ -98,8 +98,9 @@ def _get_deployment_status(
 def _execute_deployment(tool_name: str, deploy_token: str) -> bool:
     deploy_id = _start_deployment(tool_name, deploy_token)
     if deploy_id is None:
-        return
+        return False
 
+    print(f"Started deployment: {deploy_id}")
     while True:
         deployment_status = _get_deployment_status(tool_name, deploy_id, deploy_token)
         if deployment_status == "successful":
