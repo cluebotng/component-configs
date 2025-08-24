@@ -143,7 +143,7 @@ def _generate_workflow(tool_name: str):
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
     config += "        with:\n"
     config += f"          user: '{tool_name}'\n"
-    config += "          task: trigger-deploy\n"
+    config += "          task: execute-deploy\n"
     config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
     config += "      # - uses: cluebotng/ci-toolforge-deploy@main\n"
     config += "      #   with:\n"
