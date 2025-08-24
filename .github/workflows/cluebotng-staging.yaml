@@ -3,7 +3,7 @@ on: { push: { branches: [ main ], paths: [ 'cluebotng-staging.yaml' ] } }
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: 'cluebotng-staging'
+    #environment: 'cluebotng-staging'
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
@@ -11,7 +11,12 @@ jobs:
           user: 'cluebotng-staging'
           task: setup
           ssh_key: ${{ secrets.CI_SSH_KEY }}
-      - uses: cluebotng/ci-toolforge-deploy@main
+      - uses: cluebotng/ci-execute-fabric@main
         with:
-          tool: 'cluebotng-staging'
-          token: '${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'
+          user: 'cluebotng-staging'
+          task: trigger-deploy
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+      # - uses: cluebotng/ci-toolforge-deploy@main
+      #   with:
+      #      tool: 'cluebotng-staging'
+      #     token: '${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'
