@@ -10,7 +10,6 @@ jobs:
           user: 'cluebotng-trainer'
           task: setup
           ssh_key: ${{ secrets.CI_SSH_KEY }}
-      - uses: cluebotng/ci-execute-fabric@main
   deploy:
     runs-on: ubuntu-latest
     #environment: 'cluebotng-trainer'

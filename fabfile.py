@@ -131,7 +131,6 @@ def _generate_workflow(tool_name: str):
     config += f"          user: '{tool_name}'\n"
     config += "          task: setup\n"
     config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
-    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
 
     config += "  deploy:\n"
     config += "    runs-on: ubuntu-latest\n"
