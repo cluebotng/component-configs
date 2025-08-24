@@ -108,7 +108,7 @@ def _execute_deployment(tool_name: str, deploy_token: str) -> bool:
             return True
 
         if deployment_status in ["pending", "running"]:
-            print("Deployment is pending on in progress")
+            print("Deployment is pending or in progress")
             time.sleep(1)
             continue
 
