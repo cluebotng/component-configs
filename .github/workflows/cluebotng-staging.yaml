@@ -1,9 +1,8 @@
 name: 'Trigger deploy for cluebotng-staging'
 on: { push: { branches: [ main ], paths: [ 'cluebotng-staging.yaml', '.github/workflows/cluebotng-staging.yaml' ] } }
 jobs:
-  deploy:
+  update-config:
     runs-on: ubuntu-latest
-    #environment: 'cluebotng-staging'
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
@@ -11,6 +10,13 @@ jobs:
           user: 'cluebotng-staging'
           task: setup
           ssh_key: ${{ secrets.CI_SSH_KEY }}
+      - uses: cluebotng/ci-execute-fabric@main
+  deploy:
+    runs-on: ubuntu-latest
+    #environment: 'cluebotng-staging'
+    needs: [update-config]
+    steps:
+      - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
         with:
           user: 'cluebotng-staging'

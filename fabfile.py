@@ -120,19 +120,27 @@ def _generate_workflow(tool_name: str):
     config = f"name: 'Trigger deploy for {tool_name}'\n"
     config += f"on: {{ push: {{ branches: [ main ], paths: [ '{tool_name}.yaml', '.github/workflows/{tool_name}.yaml' ] }} }}\n"
     config += "jobs:\n"
-    config += "  deploy:\n"
-    config += "    runs-on: ubuntu-latest\n"
-    config += f"    #environment: '{tool_name}'\n"
-    config += "    steps:\n"
-
     # Until T401868 is resolved, update the tool with the config we want deployed
     # Note: the config will not be re-fetched as `source_url` cannot be rewritten on the same sha... so this is '1 off'
+    config += "  update-config:\n"
+    config += "    runs-on: ubuntu-latest\n"
+    config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
     config += "        with:\n"
     config += f"          user: '{tool_name}'\n"
     config += "          task: setup\n"
     config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
+    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
+
+    config += "  deploy:\n"
+    config += "    runs-on: ubuntu-latest\n"
+    config += f"    #environment: '{tool_name}'\n"
+    config += "    needs: [update-config]\n"
+    config += "    steps:\n"
+    config += "      - uses: actions/checkout@v4\n"
+    # There isn't a clean way to get the SSH key (from org secrets) and deploy token (from environment secrets),
+    # so get the deploy token from the tool account directly.
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
     config += "        with:\n"
     config += f"          user: '{tool_name}'\n"

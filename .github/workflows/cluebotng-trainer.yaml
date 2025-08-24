@@ -1,9 +1,8 @@
 name: 'Trigger deploy for cluebotng-trainer'
 on: { push: { branches: [ main ], paths: [ 'cluebotng-trainer.yaml', '.github/workflows/cluebotng-trainer.yaml' ] } }
 jobs:
-  deploy:
+  update-config:
     runs-on: ubuntu-latest
-    #environment: 'cluebotng-trainer'
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
@@ -11,6 +10,13 @@ jobs:
           user: 'cluebotng-trainer'
           task: setup
           ssh_key: ${{ secrets.CI_SSH_KEY }}
+      - uses: cluebotng/ci-execute-fabric@main
+  deploy:
+    runs-on: ubuntu-latest
+    #environment: 'cluebotng-trainer'
+    needs: [update-config]
+    steps:
+      - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
         with:
           user: 'cluebotng-trainer'
