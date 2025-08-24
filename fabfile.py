@@ -62,6 +62,7 @@ def _generate_workflow(tool_name: str):
 
     # Until T401868 is resolved, update the tool with the config we want deployed
     # Note: the config will not be re-fetched as `source_url` cannot be rewritten on the same sha... so this is '1 off'
+    config += '      - uses: actions/checkout@v4\n'
     config += '      - uses: cluebotng/ci-execute-fabric@main\n'
     config += '        with:\n'
     config += f'          user: \'{tool_name}\'\n'

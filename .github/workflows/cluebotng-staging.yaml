@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 'cluebotng-staging'
     steps:
+      - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
         with:
           user: 'cluebotng-staging'
