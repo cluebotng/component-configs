@@ -1,5 +1,5 @@
 name: 'Trigger deploy for cluebotng-staging'
-on: { push: { branches: [ main ], paths: [ 'cluebotng-staging.yaml' ] } }
+on: { push: { branches: [ main ], paths: [ 'cluebotng-staging.yaml', '.github/workflows/cluebotng-staging.yaml' ] } }
 jobs:
   deploy:
     runs-on: ubuntu-latest

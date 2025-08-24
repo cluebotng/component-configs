@@ -118,9 +118,7 @@ def _execute_deployment(tool_name: str, deploy_token: str) -> bool:
 def _generate_workflow(tool_name: str):
     # We do this to avoid `yaml` as a dep, it's simple enough
     config = f"name: 'Trigger deploy for {tool_name}'\n"
-    config += (
-        f"on: {{ push: {{ branches: [ main ], paths: [ '{tool_name}.yaml' ] }} }}\n"
-    )
+    config += f"on: {{ push: {{ branches: [ main ], paths: [ '{tool_name}.yaml', '.github/workflows/{tool_name}.yaml' ] }} }}\n"
     config += "jobs:\n"
     config += "  deploy:\n"
     config += "    runs-on: ubuntu-latest\n"
