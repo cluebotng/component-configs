@@ -5,6 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: 'cluebotng-trainer'
     steps:
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-trainer'
+          task: setup
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
       - uses: cluebotng/ci-toolforge-deploy@main
         with:
           tool: 'cluebotng-trainer'
