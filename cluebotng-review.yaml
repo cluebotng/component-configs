@@ -26,6 +26,7 @@ components:
     build:
       repository: https://github.com/cluebotng/external-redis.git
       ref: main
+      use_latest_versions: true
     run:
       command: run-redis
       port: 6379
