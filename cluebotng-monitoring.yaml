@@ -38,7 +38,7 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       port: 3000
-      http_check_health: /api/health
+      health_check_http: /api/health
   checker:
     build:
       repository: https://github.com/cluebotng/monitoring-probes.git
@@ -49,4 +49,4 @@ components:
       cpu: '0.5'
       memory: 0.5Gi
       port: 8090
-      http_check_health: /health
+      health_check_http: /health
