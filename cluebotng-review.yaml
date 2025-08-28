@@ -1,4 +1,3 @@
-source_url: https://raw.githubusercontent.com/cluebotng/component-configs/refs/heads/main/cluebotng-review.yaml
 components:
   # Core services
   cluebotng-reviewer:
@@ -32,17 +31,17 @@ components:
       port: 6379
       mount: all
   # Helper services
-  irc-relay:
-    build:
-      repository: https://github.com/cluebotng/irc_relay.git
-      ref: v1.1.9
-      use_latest_versions: true
-    run:
-      command: run-relay
-      cpu: '0.5'
-      memory: 0.5Gi
-      port: 3334
-      port_protocol: udp
+#  irc-relay:
+#    build:
+#      repository: https://github.com/cluebotng/irc_relay.git
+#      ref: v1.1.9
+#      use_latest_versions: true
+#    run:
+#      command: run-relay
+#      cpu: '0.5'
+#      memory: 0.5Gi
+#      port: 3334
+#      port_protocol: udp
   celery-flower:
     build:
       reuse_from: cluebotng-reviewer
