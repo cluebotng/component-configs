@@ -1,0 +1,31 @@
+name: 'Trigger deploy for cluebotng-monitoring'
+on: { push: { branches: [ main ], paths: [ 'cluebotng-monitoring.yaml', '.github/workflows/cluebotng-monitoring.yaml' ] } }
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cluebotng-monitoring-update-config
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-monitoring'
+          task: setup
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cluebotng-monitoring-deploy
+    #environment: 'cluebotng-monitoring'
+    needs: [update-config]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-monitoring'
+          task: execute-deploy
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+      # - uses: cluebotng/ci-toolforge-deploy@main
+      #   with:
+      #      tool: 'cluebotng-monitoring'
+      #     token: '${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'
