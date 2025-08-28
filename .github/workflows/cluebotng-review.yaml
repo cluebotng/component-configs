@@ -1,0 +1,27 @@
+name: 'Trigger deploy for cluebotng-review'
+on: { push: { branches: [ main ], paths: [ 'cluebotng-review.yaml', '.github/workflows/cluebotng-review.yaml' ] } }
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-review'
+          task: setup
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  deploy:
+    runs-on: ubuntu-latest
+    #environment: 'cluebotng-review'
+    needs: [update-config]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-review'
+          task: execute-deploy
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+      # - uses: cluebotng/ci-toolforge-deploy@main
+      #   with:
+      #      tool: 'cluebotng-review'
+      #     token: '${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'

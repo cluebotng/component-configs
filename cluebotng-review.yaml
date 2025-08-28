@@ -1,0 +1,164 @@
+source_url: https://raw.githubusercontent.com/cluebotng/component-configs/refs/heads/main/cluebotng-review.yaml
+components:
+  # Core services
+  cluebotng-reviewer:
+    build:
+      repository: https://github.com/cluebotng/reviewer.git
+      ref: v0.1.8
+      use_latest_versions: true
+    run:
+      command: web
+      cpu: '0.5'
+      memory: 0.5Gi
+      port: 8000
+      replicas: 2
+      health_check_http: /internal/health/
+  celery-worker:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: run-celery
+      cpu: '0.5'
+      memory: 0.5Gi
+      replicas: 1
+  # Runtime dependencies
+  redis:
+    build:
+      repository: https://gitlab.wikimedia.org/toolforge-repos/containers-redis.git
+      ref: main
+      use_latest_versions: true
+    run:
+      command: server
+      port: 6379
+  # Helper services
+  irc-relay:
+    build:
+      repository: https://github.com/cluebotng/irc_relay.git
+      ref: v1.1.9
+      use_latest_versions: true
+    run:
+      command: run-relay
+      cpu: '0.5'
+      memory: 1.0Gi
+      port: 3334
+  celery-flower:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: run-flower
+      port: 5555
+      health_check_http: /healthcheck
+  grafana-alloy:
+    build:
+      repository: https://github.com/cluebotng/external-grafana-alloy.git
+      ref: refs/tags/v0.1.7
+      use_latest_versions: true
+    run:
+      command: run-alloy
+      cpu: '0.5'
+      memory: 0.5Gi
+      port: 8118
+      health_check_http: /health
+  # Scheduled jobs
+
+  ## Core jobs
+  export-statistics:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py export_statistics
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 13 9 * * *
+  update-edit-classifications:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py update_edit_classification
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 30 */2 * * *
+  ## Seed jobs
+  add-reported-edits:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py add_reported_edits
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 55 * * * *
+  add-edits-to-queue:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py add_edits_to_queue
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 13 6 * * *
+  ## Helper jobs
+  add-reviews-from-report:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py add_reviews_from_report
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 15 * * * *
+  add-reviews-from-huggle:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py add_reviews_from_huggle
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 23 */2 * * *
+  ## Back-fill jobs
+  import-training-data:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py import_training_data
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 15 2 * * *
+  mark-edits-as-deleted:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py mark_edits_as_deleted
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 13 4 * * *
+  mark-edits-as-having-data:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py mark_edits_with_training_data
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 13 3 * * *
+  add-dangling-edits-to-group:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py add_dangling_edits_to_group
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 13 21 * * *
+  ## Management jobs
+  cleanup-user-records:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py cleanup_user_records
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 13 1 * * *
+  grant-review-access-from-wikipedia-rights:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py grant_review_access_from_rights
+      cpu: '0.5'
+      memory: 0.5Gi
+      schedule: 27 * * * *
