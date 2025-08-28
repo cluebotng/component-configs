@@ -41,7 +41,9 @@ components:
       http_check_health: /api/health
   checker:
     build:
-      reuse_from: prometheus
+      repository: https://github.com/cluebotng/monitoring-probes.git
+      ref: main
+      use_latest_versions: true
     run:
       command: run-checker
       cpu: '0.5'
