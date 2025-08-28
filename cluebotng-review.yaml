@@ -26,7 +26,6 @@ components:
     build:
       repository: https://gitlab.wikimedia.org/toolforge-repos/containers-redis.git
       ref: main
-      use_latest_versions: true
     run:
       command: server
       port: 6379
