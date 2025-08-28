@@ -40,13 +40,16 @@ components:
     run:
       command: run-relay
       cpu: '0.5'
-      memory: 1.0Gi
+      memory: 0.5Gi
       port: 3334
+      port_protocol: udp
   celery-flower:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: run-flower
+      cpu: '0.5'
+      memory: 0.5Gi
       port: 5555
       health_check_http: /healthcheck
   grafana-alloy:
