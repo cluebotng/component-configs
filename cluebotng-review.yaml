@@ -4,7 +4,7 @@ components:
   cluebotng-reviewer:
     build:
       repository: https://github.com/cluebotng/reviewer.git
-      ref: v0.1.8
+      ref: refs/tags/v0.4.0
       use_latest_versions: true
     run:
       command: web
