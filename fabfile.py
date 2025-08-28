@@ -1,3 +1,4 @@
+import base64
 import os
 import sys
 import time
@@ -36,9 +37,11 @@ def _get_target_tools() -> List[str]:
     ]
 
 
-def _setup_component_configs(tool_name: str, latest_sha: Optional[str]):
-    config_url = _get_config_url(tool_name, latest_sha)
-    print(f"[{tool_name}] applying {config_url}")
+def _setup_component_configs(tool_name: str):
+    with (PosixPath(__name__).parent / f'{tool_name}.yaml').open('r') as fh:
+        config = fh.read()
+
+    encoded_config = base64.b64encode(config.encode("utf-8")).decode("utf-8")
 
     c = Connection(
         "login.toolforge.org",
@@ -49,7 +52,7 @@ def _setup_component_configs(tool_name: str, latest_sha: Optional[str]):
         ),
     )
     c.sudo(
-        f"bash -c 'curl -s --fail {config_url} | "
+        f"bash -c 'base64 -d <<<{encoded_config} | "
         f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components config create'",
     )
 
@@ -167,10 +170,10 @@ def create_workflows(_ctx):
 @task()
 def setup(_ctx):
     """Ensure the tool accounts have component configs setup."""
-    latest_sha = _get_head_ref()
     for tool_name in _get_target_tools():
         if TARGET_USER is None or tool_name == TARGET_USER:
-            _setup_component_configs(tool_name, latest_sha)
+            print(f"Applying config for {tool_name}")
+            _setup_component_configs(tool_name)
 
 
 @task()
