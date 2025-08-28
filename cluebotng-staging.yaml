@@ -36,3 +36,12 @@ components:
       port: 8118
       health_check_http: /health
       mount: all
+  redis:
+    build:
+      repository: https://github.com/cluebotng/external-redis.git
+      ref: main
+      use_latest_versions: true
+    run:
+      command: redis-server
+      port: 6379
+      mount: all
