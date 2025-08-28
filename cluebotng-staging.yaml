@@ -44,4 +44,3 @@ components:
     run:
       command: redis-server
       port: 6379
-      mount: all
