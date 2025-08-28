@@ -28,7 +28,7 @@ components:
       ref: main
       use_latest_versions: true
     run:
-      command: run-redis
+      command: redis-server
       port: 6379
       mount: all
   # Helper services
