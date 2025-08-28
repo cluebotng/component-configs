@@ -3,6 +3,8 @@ on: { push: { branches: [ main ], paths: [ 'cluebotng-trainer.yaml', '.github/wo
 jobs:
   update-config:
     runs-on: ubuntu-latest
+    concurrency:
+      group: cluebotng-trainer-update-config
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
@@ -12,6 +14,8 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   deploy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: cluebotng-trainer-deploy
     #environment: 'cluebotng-trainer'
     needs: [update-config]
     steps:

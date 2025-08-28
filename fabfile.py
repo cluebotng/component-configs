@@ -128,6 +128,8 @@ def _generate_workflow(tool_name: str):
     # Note: the config will not be re-fetched as `source_url` cannot be rewritten on the same sha... so this is '1 off'
     config += "  update-config:\n"
     config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency:\n"
+    config += f"      group: {tool_name}-update-config\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
@@ -138,6 +140,8 @@ def _generate_workflow(tool_name: str):
 
     config += "  deploy:\n"
     config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency:\n"
+    config += f"      group: {tool_name}-deploy\n"
     config += f"    #environment: '{tool_name}'\n"
     config += "    needs: [update-config]\n"
     config += "    steps:\n"
