@@ -42,7 +42,7 @@ components:
   checker:
     build:
       repository: https://github.com/cluebotng/monitoring-probes.git
-      ref: main
+      ref: refs/tags/v1.0.0
       use_latest_versions: true
     run:
       command: run-checker
