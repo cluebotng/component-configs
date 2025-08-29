@@ -39,6 +39,15 @@ components:
       memory: 0.5Gi
       port: 3000
       health_check_http: /api/health
+  wiki-update-receiver:
+    build:
+      reuse_from: prometheus
+    run:
+      command: run-updater
+      cpu: '0.5'
+      memory: 0.5Gi
+      port: 8900
+      health_check_http: /health
   checker:
     build:
       repository: https://github.com/cluebotng/monitoring-probes.git
