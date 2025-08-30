@@ -3,7 +3,7 @@ components:
   cluebotng-reviewer:
     build:
       repository: https://github.com/cluebotng/reviewer.git
-      ref: refs/tags/v0.5.1
+      ref: refs/tags/v0.5.2
       use_latest_versions: true
     run:
       command: web
