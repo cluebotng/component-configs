@@ -7,6 +7,8 @@ components:
       use_latest_versions: true
     run:
       command: run-prometheus
+      cpu: '0.51'
+      memory: 0.51Gi
       port: 9090
       health_check_http: /-/healthy
       mount: all
@@ -15,6 +17,8 @@ components:
       reuse_from: prometheus
     run:
       command: run-alert-manager
+      cpu: '0.51'
+      memory: 0.51Gi
       port: 9093
       health_check_http: /-/healthy
       mount: all
@@ -23,12 +27,16 @@ components:
       reuse_from: prometheus
     run:
       command: run-blackbox-exporter
+      cpu: '0.51'
+      memory: 0.51Gi
       port: 9115
   grafana:
     build:
       reuse_from: prometheus
     run:
       command: run-grafana
+      cpu: '0.51'
+      memory: 0.51Gi
       port: 3000
       health_check_http: /api/health
   wiki-update-receiver:
@@ -36,6 +44,8 @@ components:
       reuse_from: prometheus
     run:
       command: run-updater
+      cpu: '0.51'
+      memory: 0.51Gi
       port: 8900
       health_check_http: /health
   checker:
@@ -45,5 +55,7 @@ components:
       use_latest_versions: true
     run:
       command: run-checker
+      cpu: '0.51'
+      memory: 0.51Gi
       port: 8090
       health_check_http: /health

@@ -7,6 +7,8 @@ components:
       use_latest_versions: true
     run:
       command: web
+      cpu: '0.51'
+      memory: 0.51Gi
       port: 8000
       replicas: 2
       health_check_http: /internal/health/
@@ -15,6 +17,8 @@ components:
       reuse_from: cluebotng-reviewer
     run:
       command: run-celery
+      cpu: '0.51'
+      memory: 0.51Gi
       replicas: 2
   # Runtime dependencies
   redis:
@@ -24,6 +28,8 @@ components:
       use_latest_versions: true
     run:
       command: redis-server
+      cpu: '0.51'
+      memory: 0.51Gi
       port: 6379
       mount: all
       # Helper services
@@ -34,6 +40,8 @@ components:
   #      use_latest_versions: true
   #    run:
   #      command: run-relay
+  #      cpu: '0.51'
+  #      memory: 0.25Gi
   #      port: 3334
   #      port_protocol: udp
 
@@ -42,6 +50,8 @@ components:
       reuse_from: cluebotng-reviewer
     run:
       command: run-flower
+      cpu: '0.51'
+      memory: 0.25Gi
       port: 5555
       health_check_http: /healthcheck
   grafana-alloy:
@@ -51,6 +61,8 @@ components:
       use_latest_versions: true
     run:
       command: run-alloy
+      cpu: '0.51'
+      memory: 0.25Gi
       port: 8118
       health_check_http: /health
   # Scheduled jobs
@@ -61,12 +73,16 @@ components:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py export_statistics
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 13 9 * * *
   update-edit-classifications:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py update_edit_classification
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 30 */2 * * *
   ## Seed jobs
   add-reported-edits:
@@ -74,12 +90,16 @@ components:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py add_reported_edits
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 55 * * * *
   add-edits-to-queue:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py add_edits_to_queue
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 13 6 * * *
   ## Helper jobs
   add-reviews-from-report:
@@ -87,12 +107,16 @@ components:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py add_reviews_from_report
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 15 * * * *
   add-reviews-from-huggle:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py add_reviews_from_huggle
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 23 */2 * * *
   ## Back-fill jobs
   import-training-data:
@@ -100,24 +124,32 @@ components:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py import_training_data
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 15 2 * * *
   mark-edits-as-deleted:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py mark_edits_as_deleted
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 13 4 * * *
   mark-edits-as-having-data:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py mark_edits_with_training_data
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 13 3 * * *
   add-dangling-edits-to-group:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py add_dangling_edits_to_group
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 13 21 * * *
   ## Management jobs
   cleanup-user-records:
@@ -125,10 +157,14 @@ components:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py cleanup_user_records
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 13 1 * * *
   grant-review-access-from-wikipedia-rights:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py grant_review_access_from_rights
+      cpu: '0.51'
+      memory: 0.25Gi
       schedule: 27 * * * *
