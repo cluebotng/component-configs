@@ -8,14 +8,14 @@ components:
     run:
       command: web
       port: 8000
-      replicas: 1
+      replicas: 2
       health_check_http: /internal/health/
   celery-worker:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: run-celery
-      replicas: 1
+      replicas: 2
   # Runtime dependencies
   redis:
     build:
