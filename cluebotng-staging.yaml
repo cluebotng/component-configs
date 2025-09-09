@@ -10,8 +10,6 @@ components:
       use_latest_versions: true
     run:
       command: botng --irc-relay --debug
-      cpu: "0.51"
-      memory: 1Gi
       port: 8118
       health_check_http: /health
   core:
@@ -21,8 +19,6 @@ components:
       use_latest_versions: true
     run:
       command: ./cluebotng -l -m live_run
-      cpu: "0.51"
-      memory: 0.51Gi
       port: 3565
   grafana-alloy:
     build:
@@ -31,8 +27,6 @@ components:
       use_latest_versions: true
     run:
       command: run-alloy
-      cpu: '0.5'
-      memory: 0.51Gi
       port: 8118
       health_check_http: /health
       mount: all
