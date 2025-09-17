@@ -126,6 +126,12 @@ components:
     run:
       command: ./manage.py cleanup_user_records
       schedule: 13 1 * * *
+  update-user-usernames:
+    build:
+      reuse_from: cluebotng-reviewer
+    run:
+      command: ./manage.py update_usernames
+      schedule: 13 2 * * *
   grant-review-access-from-wikipedia-rights:
     build:
       reuse_from: cluebotng-reviewer
