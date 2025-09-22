@@ -31,7 +31,7 @@ class WebServiceConfig:
                 "labels": {
                     "name": self.tool_name,
                     "toolforge": "tool",
-                }
+                },
             },
             "spec": {
                 "ingressClassName": "toolforge",
@@ -270,9 +270,12 @@ def _ensure_kubernetes_object(
     return _apply_kubernetes_object(c, obj.as_k8s_object())
 
 
-def _dologmsg(c: Connection, message: str):
+def _dologmsg(tool_name: str, message: str):
+    c = _get_connection_for_tool(tool_name)
+
     if EMIT_LOG_MESSAGES:
-        c.sudo(f"dologmsg '{message}'")
+        feed_message = f"#wikimedia-cloud-feed !log 'component-configs@tools-bastion' 'tools.{tool_name}' '{message}'"
+        c.run(f"echo '{feed_message}' > /dev/tcp/wm-bot.wm-bot.wmcloud.org/64835")
 
 
 def _start_deployment(tool_name: str, deploy_token: str) -> str:
@@ -477,8 +480,7 @@ def deploy(ctx):
 @task()
 def dologmsg(ctx, message):
     if TARGET_USER is None:
-        print('TARGET_USER must be specified for dologmsg')
+        print("TARGET_USER must be specified for dologmsg")
         sys.exit(1)
 
-    c = _get_connection_for_tool(TARGET_USER)
-    _dologmsg(c, message)
+    _dologmsg(TARGET_USER, message)
