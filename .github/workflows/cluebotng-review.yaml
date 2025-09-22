@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: cluebotng-review
-    needs: [deploy-network-policies]
+    needs: [update-network-policies]
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: cluebotng-review
-    needs: [deploy-network-policies, update-component-config]
+    needs: [update-network-policies, update-component-config]
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: cluebotng-review
-    needs: [deploy-network-policies, update-component-config]
+    needs: [update-network-policies, update-component-config]
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
