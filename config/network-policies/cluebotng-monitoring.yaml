@@ -1,0 +1,50 @@
+# Core tools
+- name: restrict-prometheus
+  match: prometheus
+  allow:
+    # Internal access
+    - pod: grafana
+
+    # Namespaces which use remote write
+    - namespace: tool-cluebotng
+    - namespace: tool-cluebotng-review
+    - namespace: tool-cluebotng-staging
+
+- name: restrict-alertmanager
+  match: alertmanager
+  allow:
+    # Internal access
+    - pod: prometheus
+    - pod: grafana
+
+# Alertmanager web hooks
+- name: restrict-wiki-update-receiver
+  match: wiki-update-receiver
+  allow:
+    # Internal access
+    - name: alertmanager
+
+# Exporters
+- name: restrict-blackbox-exporter
+  match: blackbox-exporter
+  allow:
+    # Internal access
+    - name: prometheus
+
+- name: restrict-checker
+  match: checker
+  allow:
+    # Internal access
+    - name: prometheus
+
+- name: restrict-grafana-alloy
+  match: grafana-alloy
+  allow:
+    - namespace: tool-cluebotng-monitoring
+
+# Cleanup
+- name: restrict-alertmanager-access
+  delete: True
+
+- name: restrict-prometheus-access
+  delete: True

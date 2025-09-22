@@ -1,0 +1,27 @@
+- name: restrict-irc-relay
+  match: irc-relay
+  allow:
+    - pod: bot
+
+- name: restrict-core
+  match: core
+  allow:
+    - pod: bot
+
+- name: restrict-redis
+  match: redis
+  allow:
+    - pod: bot
+    - pod: report-interface
+
+- name: restrict-grafana-alloy
+  match: grafana-alloy
+  allow:
+    - namespace: tool-cluebotng-monitoring
+
+# Cleanup
+- name: limit-access-bot
+  delete: True
+
+- name: limit-access-core
+  delete: True

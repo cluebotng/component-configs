@@ -1,0 +1,13 @@
+- name: allow-irc-relay-access-from-all-tool-jobs
+  match: irc-relay
+  allow:
+    - namespace: tool-cluebotng-review
+
+- name: restrict-grafana-alloy
+  match: grafana-alloy
+  allow:
+    - namespace: tool-cluebotng-monitoring
+
+# Cleanup
+- name: limit-access-irc-relay
+  delete: True

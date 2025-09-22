@@ -20,6 +20,15 @@ components:
     run:
       command: ./cluebotng -l -m live_run
       port: 3565
+  report-interface:
+    build:
+      repository: https://github.com/cluebotng/report.git
+      ref: refs/tags/v1.2.0
+      use_latest_versions: true
+    run:
+      command: web
+      port: 8000
+      health_check_http: /api/?action=health.check
   grafana-alloy:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
