@@ -1,5 +1,5 @@
 name: 'Trigger deploy for cluebotng-monitoring'
-on: { push: { branches: [ main ], paths: [ 'cluebotng-monitoring.yaml', '.github/workflows/cluebotng-monitoring.yaml' ] } }
+on: { push: { branches: [ main ], paths: [ 'cluebotng-monitoring.yaml', 'config/network-policies/cluebotng-monitoring.yaml', 'config/web-services/cluebotng-monitoring.yaml', '.github/workflows/cluebotng-monitoring.yaml' ] } }
 jobs:
   update-config:
     runs-on: ubuntu-latest
