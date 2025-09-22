@@ -325,13 +325,12 @@ def _generate_workflow(tool_name: str):
     config += f"'config/web-services/{tool_name}.yaml', "
     config += f"'.github/workflows/{tool_name}.yaml' "
     config += f"] }} }}\n"
+    config += f"concurrency:\n  group: {tool_name}\n"
     config += "jobs:\n"
     # Until T401868 is resolved, update the tool with the config we want deployed
     # Note: the config will not be re-fetched as `source_url` cannot be rewritten on the same sha... so this is '1 off'
     config += "  update-network-policies:\n"
     config += "    runs-on: ubuntu-latest\n"
-    config += "    concurrency:\n"
-    config += f"      group: {tool_name}\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
@@ -342,8 +341,6 @@ def _generate_workflow(tool_name: str):
 
     config += "  update-component-config:\n"
     config += "    runs-on: ubuntu-latest\n"
-    config += "    concurrency:\n"
-    config += f"      group: {tool_name}\n"
     config += "    needs: [update-network-policies]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"
@@ -355,8 +352,6 @@ def _generate_workflow(tool_name: str):
 
     config += "  execute-deployment:\n"
     config += "    runs-on: ubuntu-latest\n"
-    config += "    concurrency:\n"
-    config += f"      group: {tool_name}\n"
     config += "    needs: [update-network-policies, update-component-config]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"
@@ -368,8 +363,6 @@ def _generate_workflow(tool_name: str):
 
     config += "  update-webservice:\n"
     config += "    runs-on: ubuntu-latest\n"
-    config += "    concurrency:\n"
-    config += f"      group: {tool_name}\n"
     config += "    needs: [update-network-policies, update-component-config, execute-deployment]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"

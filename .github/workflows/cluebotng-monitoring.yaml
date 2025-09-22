@@ -1,10 +1,10 @@
 name: 'Execute deployment for cluebotng-monitoring'
 on: { push: { branches: [ main ], paths: [ 'cluebotng-monitoring.yaml', 'config/network-policies/cluebotng-monitoring.yaml', 'config/web-services/cluebotng-monitoring.yaml', '.github/workflows/cluebotng-monitoring.yaml' ] } }
+concurrency:
+  group: cluebotng-monitoring
 jobs:
   update-network-policies:
     runs-on: ubuntu-latest
-    concurrency:
-      group: cluebotng-monitoring
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
@@ -14,8 +14,6 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   update-component-config:
     runs-on: ubuntu-latest
-    concurrency:
-      group: cluebotng-monitoring
     needs: [update-network-policies]
     steps:
       - uses: actions/checkout@v4
@@ -26,8 +24,6 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   execute-deployment:
     runs-on: ubuntu-latest
-    concurrency:
-      group: cluebotng-monitoring
     needs: [update-network-policies, update-component-config]
     steps:
       - uses: actions/checkout@v4
@@ -38,8 +34,6 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   update-webservice:
     runs-on: ubuntu-latest
-    concurrency:
-      group: cluebotng-monitoring
     needs: [update-network-policies, update-component-config, execute-deployment]
     steps:
       - uses: actions/checkout@v4
