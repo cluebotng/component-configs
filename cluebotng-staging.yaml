@@ -27,7 +27,7 @@ components:
       use_latest_versions: true
     run:
       command: web
-      port: 5340
+      port: 8000
       health_check_http: /api/?action=health.check
   grafana-alloy:
     build:
