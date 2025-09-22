@@ -318,7 +318,7 @@ def _execute_deployment(tool_name: str, deploy_token: str) -> bool:
 
 def _generate_workflow(tool_name: str):
     # We do this to avoid `yaml` as a dep, it's simple enough
-    config = f"name: 'Execute deployment for {tool_name}'\n"
+    config = f"name: '{tool_name}'\n"
     config += f"on: {{ push: {{ branches: [ main ], paths: [ "
     config += f"'{tool_name}.yaml', "
     config += f"'config/network-policies/{tool_name}.yaml', "
