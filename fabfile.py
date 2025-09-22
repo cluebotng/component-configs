@@ -405,7 +405,7 @@ def execute_deployment(_ctx):
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
             if deploy_token := _get_deployment_token(c, tool_name):
-                if not _execute_deployment(c, tool_name, deploy_token):
+                if not _execute_deployment(tool_name, deploy_token):
                     print(f"Deployment failed for {tool_name}")
                     if TARGET_USER:
                         # If we are executing for a single tool, the exit with a failure code
