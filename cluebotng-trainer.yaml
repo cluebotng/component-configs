@@ -8,7 +8,7 @@ components:
       schedule: '13 13,23 * * *'
       mount: none
       # This will trigger other jobs, which in turn will create k8s pods, which will do the actual work
-      command: ./deployment/entrypoint.sh run-edit-sets
+      command: launcher cbng-trainer run-edit-sets
 
   file-api:
     build:
