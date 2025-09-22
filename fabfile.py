@@ -370,7 +370,7 @@ def _generate_workflow(tool_name: str):
     config += "    runs-on: ubuntu-latest\n"
     config += "    concurrency:\n"
     config += f"      group: {tool_name}\n"
-    config += "    needs: [update-network-policies, update-component-config]\n"
+    config += "    needs: [update-network-policies, update-component-config, execute-deployment]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"

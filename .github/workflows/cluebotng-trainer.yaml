@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: cluebotng-trainer
-    needs: [update-network-policies, update-component-config]
+    needs: [update-network-policies, update-component-config, execute-deployment]
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
