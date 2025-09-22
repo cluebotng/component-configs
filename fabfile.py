@@ -272,7 +272,7 @@ def _ensure_kubernetes_object(
 
 def _dologmsg(c: Connection, message: str):
     if EMIT_LOG_MESSAGES:
-        c.sudo(f"echo dologmsg '{message}'")
+        c.sudo(f"dologmsg '{message}'")
 
 
 def _start_deployment(tool_name: str, deploy_token: str) -> str:
