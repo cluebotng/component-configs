@@ -1,5 +1,5 @@
 name: 'Execute deployment for cluebotng-trainer'
-on: { push: { branches: [ main ], paths: [ 'cluebotng-trainer.yaml', 'config/network-policies/cluebotng-trainer.yaml', 'config/web-services/cluebotng-trainer.yaml', '.github/workflows/cluebotng-trainer.yaml' ] } }
+on: { push: { branches: [ main ], paths: [ 'cluebotng-trainer.yaml', 'config/network-policies/cluebotng-trainer.yaml', 'config/web-services/cluebotng-trainer.yaml', '.github/workflows/cluebotng-trainer.yaml' ] }, workflow_dispatch: { } }
 concurrency:
   group: cluebotng-trainer
 jobs:

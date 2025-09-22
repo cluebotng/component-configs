@@ -1,5 +1,5 @@
 name: 'Execute deployment for cluebotng-review'
-on: { push: { branches: [ main ], paths: [ 'cluebotng-review.yaml', 'config/network-policies/cluebotng-review.yaml', 'config/web-services/cluebotng-review.yaml', '.github/workflows/cluebotng-review.yaml' ] } }
+on: { push: { branches: [ main ], paths: [ 'cluebotng-review.yaml', 'config/network-policies/cluebotng-review.yaml', 'config/web-services/cluebotng-review.yaml', '.github/workflows/cluebotng-review.yaml' ] }, workflow_dispatch: { } }
 concurrency:
   group: cluebotng-review
 jobs:

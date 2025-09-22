@@ -324,7 +324,7 @@ def _generate_workflow(tool_name: str):
     config += f"'config/network-policies/{tool_name}.yaml', "
     config += f"'config/web-services/{tool_name}.yaml', "
     config += f"'.github/workflows/{tool_name}.yaml' "
-    config += f"] }} }}\n"
+    config += f"] }}, workflow_dispatch: {{ }} }}\n"
     config += f"concurrency:\n  group: {tool_name}\n"
     config += "jobs:\n"
     # Until T401868 is resolved, update the tool with the config we want deployed
