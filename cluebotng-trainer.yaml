@@ -1,5 +1,5 @@
 components:
-  trainer:
+  coordinator:
     build:
       repository: https://github.com/cluebotng/trainer.git
       ref: refs/tags/v1.1.10
@@ -9,3 +9,12 @@ components:
       mount: none
       # This will trigger other jobs, which in turn will create k8s pods, which will do the actual work
       command: ./deployment/entrypoint.sh run-edit-sets
+
+  file-api:
+    build:
+      reuse_from: coordinator
+    run:
+      command: file-api
+      port: 8000
+      replicas: 2
+      health_check_http: /
