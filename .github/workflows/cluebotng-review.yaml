@@ -1,31 +1,50 @@
 name: 'Execute deployment for cluebotng-review'
 on: { push: { branches: [ main ], paths: [ 'cluebotng-review.yaml', 'config/network-policies/cluebotng-review.yaml', 'config/web-services/cluebotng-review.yaml', '.github/workflows/cluebotng-review.yaml' ] } }
 jobs:
-  update-config:
+  update-network-policies:
     runs-on: ubuntu-latest
     concurrency:
-      group: cluebotng-review-update-config
+      group: cluebotng-review
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
         with:
           user: 'cluebotng-review'
-          task: setup
+          task: update-network-policies
           ssh_key: ${{ secrets.CI_SSH_KEY }}
-  deploy:
+  update-component-config:
     runs-on: ubuntu-latest
     concurrency:
-      group: cluebotng-review-deploy
-    #environment: 'cluebotng-review'
-    needs: [update-config]
+      group: cluebotng-review
+    needs: [deploy-network-policies]
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
         with:
           user: 'cluebotng-review'
-          task: execute-deploy
+          task: update-component-config
           ssh_key: ${{ secrets.CI_SSH_KEY }}
-      # - uses: cluebotng/ci-toolforge-deploy@main
-      #   with:
-      #      tool: 'cluebotng-review'
-      #     token: '${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'
+  execute-deployment:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cluebotng-review
+    needs: [deploy-network-policies, update-component-config]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-review'
+          task: execute-deployment
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  update-webservice:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cluebotng-review
+    needs: [deploy-network-policies, update-component-config]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-review'
+          task: update-webservice
+          ssh_key: ${{ secrets.CI_SSH_KEY }}

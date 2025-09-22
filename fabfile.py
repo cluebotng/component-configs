@@ -328,37 +328,56 @@ def _generate_workflow(tool_name: str):
     config += "jobs:\n"
     # Until T401868 is resolved, update the tool with the config we want deployed
     # Note: the config will not be re-fetched as `source_url` cannot be rewritten on the same sha... so this is '1 off'
-    config += "  update-config:\n"
+    config += "  update-network-policies:\n"
     config += "    runs-on: ubuntu-latest\n"
     config += "    concurrency:\n"
-    config += f"      group: {tool_name}-update-config\n"
+    config += f"      group: {tool_name}\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
     config += "        with:\n"
     config += f"          user: '{tool_name}'\n"
-    config += "          task: setup\n"
+    config += "          task: update-network-policies\n"
     config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
 
-    config += "  deploy:\n"
+    config += "  update-component-config:\n"
     config += "    runs-on: ubuntu-latest\n"
     config += "    concurrency:\n"
-    config += f"      group: {tool_name}-deploy\n"
-    config += f"    #environment: '{tool_name}'\n"
-    config += "    needs: [update-config]\n"
+    config += f"      group: {tool_name}\n"
+    config += "    needs: [deploy-network-policies]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v4\n"
-    # There isn't a clean way to get the SSH key (from org secrets) and deploy token (from environment secrets),
-    # so get the deploy token from the tool account directly.
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
     config += "        with:\n"
     config += f"          user: '{tool_name}'\n"
-    config += "          task: execute-deploy\n"
+    config += "          task: update-component-config\n"
     config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
-    config += "      # - uses: cluebotng/ci-toolforge-deploy@main\n"
-    config += "      #   with:\n"
-    config += f"      #      tool: '{tool_name}'\n"
-    config += "      #     token: '${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'\n"
+
+    config += "  execute-deployment:\n"
+    config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency:\n"
+    config += f"      group: {tool_name}\n"
+    config += "    needs: [deploy-network-policies, update-component-config]\n"
+    config += "    steps:\n"
+    config += "      - uses: actions/checkout@v4\n"
+    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
+    config += "        with:\n"
+    config += f"          user: '{tool_name}'\n"
+    config += "          task: execute-deployment\n"
+    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
+
+    config += "  update-webservice:\n"
+    config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency:\n"
+    config += f"      group: {tool_name}\n"
+    config += "    needs: [deploy-network-policies, update-component-config]\n"
+    config += "    steps:\n"
+    config += "      - uses: actions/checkout@v4\n"
+    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
+    config += "        with:\n"
+    config += f"          user: '{tool_name}'\n"
+    config += "          task: update-webservice\n"
+    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
     return config
 
 
@@ -374,8 +393,8 @@ def create_workflows(_ctx):
 
 
 @task()
-def setup(_ctx):
-    """Ensure the tool accounts have component configs setup."""
+def update_component_config(_ctx):
+    """Ensure the tool accounts have a component config setup."""
     for tool_name in _get_target_tools():
         c = _get_connection_for_tool(tool_name)
         if TARGET_USER is None or tool_name == TARGET_USER:
@@ -384,32 +403,60 @@ def setup(_ctx):
 
 
 @task()
-def execute_deploy(_ctx):
-    """Execute a deployment for a tool account."""
+def execute_deployment(_ctx):
+    """Execute a component deployment for a tool account."""
+    # This can also be done externally using the deploy token, unfortunately when using environments in Github
+    # actions, the shared secrets are not passed through, so to avoid having to copy the key into every environment,
+    # fetch the deploy token from the tool account....
+    for tool_name in _get_target_tools():
+        if TARGET_USER is None or tool_name == TARGET_USER:
+            c = _get_connection_for_tool(tool_name)
+            if deploy_token := _get_deployment_token(c, tool_name):
+                if not _execute_deployment(c, tool_name, deploy_token):
+                    print(f"Deployment failed for {tool_name}")
+                    if TARGET_USER:
+                        # If we are executing for a single tool, the exit with a failure code
+                        sys.exit(1)
+
+
+@task()
+def update_webservice(_ctx):
+    """Execute a webservice deployment for a tool account."""
     webservices = _get_web_services()
+    for tool_name in _get_target_tools():
+        if TARGET_USER is None or tool_name == TARGET_USER:
+            c = _get_connection_for_tool(tool_name)
+            if webservice := webservices.get(tool_name):
+                if not _ensure_kubernetes_object(c, tool_name, webservice):
+                    print(f"Deployment failed for {tool_name}")
+                    if TARGET_USER:
+                        # If we are executing for a single tool, the exit with a failure code
+                        sys.exit(1)
+
+
+@task()
+def update_network_policies(_ctx):
+    """Execute a network policy deployment for a tool account."""
     network_policies = _get_network_policies()
     for tool_name in _get_target_tools():
-        c = _get_connection_for_tool(tool_name)
-
-        is_success = True
         if TARGET_USER is None or tool_name == TARGET_USER:
-            # This can also be done externally using the deploy token, unfortunately when using environments in Github
-            # actions, the shared secrets are not passed through, so to avoid having to copy the key into every environment,
-            # fetch the deploy token from the tool account....
-            # if deploy_token := _get_deployment_token(c, tool_name):
-            #     is_success &= _execute_deployment(c, tool_name, deploy_token)
-
-            if webservice := webservices.get(tool_name):
-                is_success &= _ensure_kubernetes_object(c, tool_name, webservice)
+            c = _get_connection_for_tool(tool_name)
 
             if network_policies := network_policies.get(tool_name):
+                is_success = True
                 for network_policy in network_policies:
                     is_success &= _ensure_kubernetes_object(
                         c, tool_name, network_policy
                     )
+                if not is_success:
+                    print(f"Deployment failed for {tool_name}")
+                    if TARGET_USER:
+                        # If we are executing for a single tool, the exit with a failure code
+                        sys.exit(1)
 
-            if not is_success:
-                print(f"Deployment failed for {tool_name}")
-                if TARGET_USER:
-                    # If we are executing for a single tool, the exit with a failure code
-                    sys.exit(1)
+
+@task()
+def deploy(ctx):
+    update_network_policies(ctx)
+    execute_deployment(ctx)
+    update_webservice(ctx)

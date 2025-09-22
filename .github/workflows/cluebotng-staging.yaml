@@ -1,31 +1,50 @@
 name: 'Execute deployment for cluebotng-staging'
 on: { push: { branches: [ main ], paths: [ 'cluebotng-staging.yaml', 'config/network-policies/cluebotng-staging.yaml', 'config/web-services/cluebotng-staging.yaml', '.github/workflows/cluebotng-staging.yaml' ] } }
 jobs:
-  update-config:
+  update-network-policies:
     runs-on: ubuntu-latest
     concurrency:
-      group: cluebotng-staging-update-config
+      group: cluebotng-staging
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
         with:
           user: 'cluebotng-staging'
-          task: setup
+          task: update-network-policies
           ssh_key: ${{ secrets.CI_SSH_KEY }}
-  deploy:
+  update-component-config:
     runs-on: ubuntu-latest
     concurrency:
-      group: cluebotng-staging-deploy
-    #environment: 'cluebotng-staging'
-    needs: [update-config]
+      group: cluebotng-staging
+    needs: [deploy-network-policies]
     steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
         with:
           user: 'cluebotng-staging'
-          task: execute-deploy
+          task: update-component-config
           ssh_key: ${{ secrets.CI_SSH_KEY }}
-      # - uses: cluebotng/ci-toolforge-deploy@main
-      #   with:
-      #      tool: 'cluebotng-staging'
-      #     token: '${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'
+  execute-deployment:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cluebotng-staging
+    needs: [deploy-network-policies, update-component-config]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-staging'
+          task: execute-deployment
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  update-webservice:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cluebotng-staging
+    needs: [deploy-network-policies, update-component-config]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-staging'
+          task: update-webservice
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
