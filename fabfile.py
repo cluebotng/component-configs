@@ -13,6 +13,7 @@ from fabric import Connection, Config, task
 
 TARGET_USER = os.environ.get("TARGET_USER")
 TOOL_BASE_DIR = PosixPath("/data/project")
+EMIT_LOG_MESSAGES = os.environ.get("EMIT_LOG_MESSAGES", "true") == "true"
 
 
 @dataclasses.dataclass
@@ -269,6 +270,11 @@ def _ensure_kubernetes_object(
     return _apply_kubernetes_object(c, obj.as_k8s_object())
 
 
+def _dologmsg(c: Connection, message: str):
+    if EMIT_LOG_MESSAGES:
+        c.sudo(f"echo dologmsg '{message}'")
+
+
 def _start_deployment(tool_name: str, deploy_token: str) -> str:
     r = requests.post(
         f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment",
@@ -371,6 +377,19 @@ def _generate_workflow(tool_name: str):
     config += f"          user: '{tool_name}'\n"
     config += "          task: update-webservice\n"
     config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
+
+    config += "  dologmsg:\n"
+    config += "    runs-on: ubuntu-latest\n"
+    config += "    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]\n"
+    config += "    steps:\n"
+    config += "      - uses: actions/checkout@v4\n"
+    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
+    config += "        with:\n"
+    config += f"          user: '{tool_name}'\n"
+    config += "          task: dologmsg\n"
+    config += "          argument: \"--message='Deployment completed: "
+    config += "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'\"\n"
+    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
     return config
 
 
@@ -453,3 +472,13 @@ def deploy(ctx):
     update_network_policies(ctx)
     execute_deployment(ctx)
     update_webservice(ctx)
+
+
+@task()
+def dologmsg(ctx, message):
+    if TARGET_USER is None:
+        print('TARGET_USER must be specified for dologmsg')
+        sys.exit(1)
+
+    c = _get_connection_for_tool(TARGET_USER)
+    _dologmsg(c, message)
