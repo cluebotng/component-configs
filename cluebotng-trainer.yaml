@@ -11,9 +11,11 @@ components:
       command: launcher cbng-trainer run-edit-sets
   file-api:
     build:
-      reuse_from: coordinator
+      repository: https://github.com/cluebotng/fileserver.git
+      ref: refs/tags/v1.0.0
+      use_latest_versions: true
     run:
-      command: file-api
+      command: run-fileserver
       port: 8000
       replicas: 2
       health_check_http: /
