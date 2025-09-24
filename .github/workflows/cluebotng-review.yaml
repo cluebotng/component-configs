@@ -51,5 +51,5 @@ jobs:
         with:
           user: 'cluebotng-review'
           task: dologmsg
-          argument: "--message='Deployment completed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (https://github.com/cluebotng/component-configs/commits/${{ github.ref }})'"
+          argument: "--message='Deployment completed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'"
           ssh_key: ${{ secrets.CI_SSH_KEY }}
