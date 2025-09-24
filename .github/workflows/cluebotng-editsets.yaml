@@ -1,5 +1,5 @@
 name: 'cluebotng-editsets'
-on: { push: { branches: [ main ], paths: [ 'cluebotng-editsets.yaml', 'config/network-policies/cluebotng-editsets.yaml', 'config/web-services/cluebotng-editsets.yaml', '.github/workflows/cluebotng-editsets.yaml' ] }, workflow_dispatch: { } }
+on: { push: { branches: [ main ], paths: [ 'cluebotng-editsets.yaml', 'config/general.yaml', 'config/network-policies/cluebotng-editsets.yaml', 'config/web-services/cluebotng-editsets.yaml', '.github/workflows/cluebotng-editsets.yaml' ] }, workflow_dispatch: { } }
 concurrency:
   group: cluebotng-editsets
 jobs:

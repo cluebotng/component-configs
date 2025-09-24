@@ -330,6 +330,7 @@ def _generate_workflow(tool_name: str):
     config = f"name: '{tool_name}'\n"
     config += f"on: {{ push: {{ branches: [ main ], paths: [ "
     config += f"'{tool_name}.yaml', "
+    config += "'config/general.yaml', "
     config += f"'config/network-policies/{tool_name}.yaml', "
     config += f"'config/web-services/{tool_name}.yaml', "
     config += f"'.github/workflows/{tool_name}.yaml' "
