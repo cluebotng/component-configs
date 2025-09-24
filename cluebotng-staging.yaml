@@ -20,6 +20,7 @@ components:
     run:
       command: ./cluebotng -l -m live_run
       port: 3565
+      replicas: 2
   report-interface:
     build:
       repository: https://github.com/cluebotng/report.git
@@ -29,6 +30,7 @@ components:
       command: web
       port: 8000
       health_check_http: /api/?action=health.check
+      replicas: 2
   grafana-alloy:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git

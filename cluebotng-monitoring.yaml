@@ -24,6 +24,7 @@ components:
     run:
       command: run-blackbox-exporter
       port: 9115
+      replicas: 2
   grafana:
     build:
       reuse_from: prometheus
@@ -31,6 +32,7 @@ components:
       command: run-grafana
       port: 3000
       health_check_http: /api/health
+      replicas: 2
   wiki-update-receiver:
     build:
       reuse_from: prometheus
@@ -38,6 +40,7 @@ components:
       command: run-updater
       port: 8900
       health_check_http: /health
+      replicas: 2
   checker:
     build:
       repository: https://github.com/cluebotng/monitoring-probes.git
@@ -47,3 +50,4 @@ components:
       command: run-checker
       port: 8090
       health_check_http: /health
+      replicas: 2
