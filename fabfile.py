@@ -274,7 +274,7 @@ def _dologmsg(tool_name: str, message: str):
     c = _get_connection_for_tool(tool_name)
 
     if EMIT_LOG_MESSAGES:
-        feed_message = f"#wikimedia-cloud-feed !log 'component-configs@tools-bastion' 'tools.{tool_name}' '{message}'"
+        feed_message = f"#wikimedia-cloud-feed !log 'component-configs' 'tools.{tool_name}' '{message}'"
         c.run(f"echo '{feed_message}' > /dev/tcp/wm-bot.wm-bot.wmcloud.org/64835")
 
 
@@ -391,7 +391,8 @@ def _generate_workflow(tool_name: str):
     config += f"          user: '{tool_name}'\n"
     config += "          task: dologmsg\n"
     config += "          argument: \"--message='Deployment completed: "
-    config += "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'\"\n"
+    config += "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} "
+    config += "(https://github.com/cluebotng/component-configs/commits/${{ github.ref }})'\"\n"
     config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
     return config
 
