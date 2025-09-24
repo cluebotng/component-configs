@@ -274,7 +274,7 @@ def _dologmsg(tool_name: str, message: str):
     c = _get_connection_for_tool(tool_name)
 
     if EMIT_LOG_MESSAGES:
-        feed_message = f"#wikimedia-cloud-feed !log component-configs tools.{tool_name} {message}"
+        feed_message = f"#wikimedia-cloud-feed !log tools.{tool_name} {message}"
         c.run(f"echo '{feed_message}' > /dev/tcp/wm-bot.wm-bot.wmcloud.org/64835 || true")
 
 
