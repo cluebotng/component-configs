@@ -232,10 +232,20 @@ def _setup_component_configs(c: Connection, tool_name: str):
 
 
 def _get_deployment_token(c: Connection, tool_name: str):
-    return c.sudo(
+    deployment_token = c.sudo(
         f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components deploy-token show --json | jq -r .token",
         hide="stdout",
     ).stdout.strip()
+
+    if deployment_token == "":
+        print(f"Creating deploy-token for {tool_name}")
+        c.sudo(
+            f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components deploy-token create",
+            hide="stdout",
+        )
+        return _get_deployment_token(c, tool_name)
+
+    return deployment_token
 
 
 def _apply_kubernetes_object(c: Connection, k8s_obj: Dict[str, Any]) -> bool:
@@ -275,7 +285,9 @@ def _dologmsg(tool_name: str, message: str):
 
     if EMIT_LOG_MESSAGES:
         feed_message = f"#wikimedia-cloud-feed !log tools.{tool_name} {message}"
-        c.run(f"echo '{feed_message}' > /dev/tcp/wm-bot.wm-bot.wmcloud.org/64835 || true")
+        c.run(
+            f"echo '{feed_message}' > /dev/tcp/wm-bot.wm-bot.wmcloud.org/64835 || true"
+        )
 
 
 def _start_deployment(tool_name: str, deploy_token: str) -> str:
