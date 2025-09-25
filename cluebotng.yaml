@@ -12,12 +12,11 @@ components:
   pushgateway:
     build:
       repository: https://github.com/cluebotng/external-pushgateway.git
-      ref: refs/tags/v0.0.1
+      ref: refs/tags/v0.0.2
       use_latest_versions: true
     run:
       command: run-pushgateway
       port: 9091
       health_check_http: /-/healthy
       mount: all
-
-  # Note: The important things are managed from the utilities repo, until components is 'stable'
+# Note: The important things are managed from the utilities repo, until components is 'stable'
