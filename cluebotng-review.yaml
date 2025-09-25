@@ -153,7 +153,7 @@ components:
   backup-database:
     build:
       repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v0.0.1
+      ref: refs/tags/v1.0.0
       use_latest_versions: true
     run:
       command: bash -c 'mkdir -p /data/project/cluebotng-review/mysql_backups/ && mysqldump --disable-ssl -h $TOOL_DB_HOST -u $TOOL_DB_USER -p$TOOL_DB_PASSWORD $TOOL_DB_SCHEMA | gzip -9 > /data/project/cluebotng-review/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
@@ -162,7 +162,7 @@ components:
   prune-backups:
     build:
       repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v0.0.1
+      ref: refs/tags/v1.0.0
       use_latest_versions: true
     run:
       command: bash -c 'find "/data/project/cluebotng-review/mysql_backups" -mtime +7 -delete'
