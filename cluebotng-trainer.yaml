@@ -19,3 +19,23 @@ components:
       port: 8000
       replicas: 2
       health_check_http: /_/health
+  # Monitoring
+  grafana-alloy:
+    build:
+      repository: https://github.com/cluebotng/external-grafana-alloy.git
+      ref: refs/tags/v0.2.8
+      use_latest_versions: true
+    run:
+      command: run-alloy
+      port: 8118
+      health_check_http: /health
+  pushgateway:
+    build:
+      repository: https://github.com/cluebotng/external-pushgateway.git
+      ref: refs/tags/v0.0.1
+      use_latest_versions: true
+    run:
+      command: run-pushgateway
+      port: 9091
+      health_check_http: /-/healthy
+      mount: all
