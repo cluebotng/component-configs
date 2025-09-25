@@ -15,7 +15,7 @@ then
   exit 1
 fi
 
-if [ "$(yq .components.${component} < ${tool_name}.yaml)" == "null" ];
+if [ "$(yq ".components.\"${component}\"" < ${tool_name}.yaml)" == "null" ];
 then
   echo "${component} not found in ${tool_name}"
   exit 1
