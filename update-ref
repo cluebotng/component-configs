@@ -22,4 +22,4 @@ then
 fi
 
 echo "Updating ${tool_name}/${component} to ${ref}"
-yq e -i ".components.${component}.build.ref = \"${ref}\"" "${tool_name}.yaml"
+yq e -i ".components.\"${component}\".build.ref = \"${ref}\"" "${tool_name}.yaml"
