@@ -1,4 +1,28 @@
 components:
+  # Core services - see utilities repo (until components-api is stable)
+
+  # Supporting services
+  redis:
+    build:
+      repository: https://github.com/cluebotng/external-redis.git
+      ref: main
+      use_latest_versions: true
+    run:
+      command: redis-server
+      port: 6379
+
+  # Report interface
+  report-interface:
+    build:
+      repository: https://github.com/cluebotng/report.git
+      ref: refs/tags/1.2.3
+      use_latest_versions: true
+    run:
+      command: web
+      port: 8000
+      health_check_http: /api/?action=health.check
+      replicas: 2
+
   # Monitoring
   grafana-alloy:
     build:
