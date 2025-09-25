@@ -54,7 +54,7 @@ components:
     build:
       reuse_from: report-review.import
     run:
-      command: bash -c 'mkdir -p /data/project/cluebotng/mysql_backups/ && mysqldump --defaults-file=/data/project/cluebotng/replica.my.cnf s52585__cb | gzip -9 > /data/project/cluebotng/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
+      command: bash -c 'mkdir -p /data/project/cluebotng/mysql_backups/ && mysqldump --defaults-file=/data/project/cluebotng/replica.my.cnf -h tools-db s52585__cb | gzip -9 > /data/project/cluebotng/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
       schedule: '45 */2 * * *'
       mount: all
   prune-backups:
