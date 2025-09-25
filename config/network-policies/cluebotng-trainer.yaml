@@ -1,0 +1,9 @@
+- name: restrict-grafana-alloy
+  match: grafana-alloy
+  allow:
+    - namespace: tool-cluebotng-monitoring
+
+- name: restrict-pushgateway
+  match: pushgateway
+  allow:
+    - namespace: tool-cluebotng-trainer

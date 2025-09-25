@@ -8,6 +8,11 @@
   allow:
     - namespace: tool-cluebotng-monitoring
 
+- name: restrict-pushgateway
+  match: pushgateway
+  allow:
+    - namespace: tool-cluebotng-review
+
 # Cleanup
 - name: limit-access-irc-relay
   delete: True

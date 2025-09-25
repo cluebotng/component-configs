@@ -19,6 +19,11 @@
   allow:
     - namespace: tool-cluebotng-monitoring
 
+- name: restrict-pushgateway
+  match: pushgateway
+  allow:
+    - namespace: tool-cluebotng-staging
+
 # Cleanup
 - name: limit-access-bot
   delete: True
