@@ -52,18 +52,14 @@ components:
   ## Backups
   backup-database:
     build:
-      repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v0.0.1
-      use_latest_versions: true
+      reuse_from: report-review.import
     run:
       command: bash -c 'mkdir -p /data/project/cluebotng/mysql_backups/ && mysqldump --defaults-file=~/replica.my.cnf s52585__cb | gzip -9 > /data/project/cluebotng/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
       schedule: '45 */2 * * *'
       mount: all
   prune-backups:
     build:
-      repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v0.0.1
-      use_latest_versions: true
+      reuse_from: report-review.import
     run:
       command: bash -c 'find "/data/project/cluebotng/mysql_backups" -mtime +7 -delete'
       schedule: '30 5 * * *'
