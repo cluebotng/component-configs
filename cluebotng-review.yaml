@@ -149,3 +149,22 @@ components:
     run:
       command: ./manage.py grant_review_access_from_rights
       schedule: 27 * * * *
+  ## Backups
+  backup-database:
+    build:
+      repository: https://github.com/cluebotng/external-utilities.git
+      ref: refs/tags/v0.0.1
+      use_latest_versions: true
+    run:
+      command: bash -c 'mkdir -p /data/project/cluebotng-review/mysql_backups/ && mysqldump --disable-ssl -h $TOOL_DB_HOST -u $TOOL_DB_USER -p$TOOL_DB_PASSWORD $TOOL_DB_SCHEMA | gzip -9 > /data/project/cluebotng-review/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
+      schedule: '45 */2 * * *'
+      mount: all
+  prune-backups:
+    build:
+      repository: https://github.com/cluebotng/external-utilities.git
+      ref: refs/tags/v0.0.1
+      use_latest_versions: true
+    run:
+      command: bash -c 'find "/data/project/cluebotng-review/mysql_backups" -mtime +7 -delete'
+      schedule: '30 5 * * *'
+      mount: all
