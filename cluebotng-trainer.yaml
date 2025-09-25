@@ -32,7 +32,7 @@ components:
   pushgateway:
     build:
       repository: https://github.com/cluebotng/external-pushgateway.git
-      ref: refs/tags/v0.0.1
+      ref: refs/tags/v0.0.2
       use_latest_versions: true
     run:
       command: run-pushgateway
