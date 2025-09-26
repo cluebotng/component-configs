@@ -21,13 +21,13 @@ components:
       port: 8000
       health_check_http: /api/?action=health.check
       replicas: 2
-  report-review.import:
+  report-review-import:
     build:
       reuse_from: report-interface
     run:
       command: curl -s https://cluebotng.toolforge.org/api/?action=review.import
       schedule: '13 * * * *'
-  report-send_whitelisted_users_to_review:
+  report-send-whitelisted-to-review:
     build:
       reuse_from: report-interface
     run:
