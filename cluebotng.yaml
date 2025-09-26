@@ -23,12 +23,16 @@ components:
       replicas: 2
   report-review.import:
     build:
-      repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v1.0.0
-      use_latest_versions: true
+      reuse_from: report-interface
     run:
       command: curl -s https://cluebotng.toolforge.org/api/?action=review.import
       schedule: '13 * * * *'
+  report-send_whitelisted_users_to_review:
+    build:
+      reuse_from: report-interface
+    run:
+      command: php -f scripts/send_whitelisted_users_to_review.php
+      schedule: '13 2 * * *'
   # Monitoring
   grafana-alloy:
     build:
@@ -52,14 +56,16 @@ components:
   ## Backups
   backup-database:
     build:
-      reuse_from: report-review.import
+      repository: https://github.com/cluebotng/external-utilities.git
+      ref: refs/tags/v1.0.0
+      use_latest_versions: true
     run:
       command: bash -c 'mkdir -p /data/project/cluebotng/mysql_backups/ && mysqldump --defaults-file=/data/project/cluebotng/replica.my.cnf -h tools-db s52585__cb | gzip -9 > /data/project/cluebotng/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
       schedule: '45 */2 * * *'
       mount: all
   prune-backups:
     build:
-      reuse_from: report-review.import
+      reuse_from: backup-database
     run:
       command: bash -c 'find "/data/project/cluebotng/mysql_backups" -mtime +7 -delete'
       schedule: '30 5 * * *'
