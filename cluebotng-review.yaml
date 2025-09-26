@@ -161,9 +161,7 @@ components:
       mount: all
   prune-backups:
     build:
-      repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v1.0.0
-      use_latest_versions: true
+      reuse_from: backup-database
     run:
       command: bash -c 'find "/data/project/cluebotng-review/mysql_backups" -mtime +7 -delete'
       schedule: '30 5 * * *'
