@@ -1,0 +1,10 @@
+components:
+  syncer:
+    build:
+      repository: https://github.com/cluebotng/repository-syncer.git
+      ref: refs/tags/v1.0.0
+      use_latest_versions: true
+    run:
+      schedule: '*/15 * * * *'
+      mount: none
+      command: run-sync
