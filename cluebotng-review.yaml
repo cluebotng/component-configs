@@ -143,11 +143,11 @@ components:
     run:
       command: ./manage.py update_usernames
       schedule: 13 2 * * *
-  grant-review-access-from-wikipedia-rights:
+  auto-grant-reviewer-access:
     build:
       reuse_from: cluebotng-reviewer
     run:
-      command: ./manage.py grant_review_access_from_rights
+      command: ./manage.py auto_grant_reviewer_access
       schedule: 27 * * * *
   ## Backups
   backup-database:
