@@ -3,7 +3,7 @@ components:
   cluebotng-reviewer:
     build:
       repository: https://github.com/cluebotng/reviewer.git
-      ref: feature/expand-auto-user-access
+      ref: refs/tags/v0.11.0
       use_latest_versions: true
     run:
       command: web
