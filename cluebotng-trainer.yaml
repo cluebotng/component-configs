@@ -5,7 +5,7 @@ components:
       ref: refs/tags/v1.2.6
       use_latest_versions: true
     run:
-      schedule: '13 13,23 * * *'
+      schedule: '13 13 * * *'
       mount: none
       # This will trigger other jobs, which in turn will create k8s pods, which will do the actual work
       command: launcher ./deployment/entrypoint.sh run-edit-sets
