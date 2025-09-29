@@ -26,20 +26,21 @@ components:
       command: redis-server
       port: 6379
       mount: all
-    # Helper services
-    # Note: Until port support exists (T401994), build the image, but `jobs.yaml` will really deploy it
-    irc-relay-placeholder:
-      build:
-        repository: https://github.com/cluebotng/irc_relay.git
-        ref: v1.1.9
-        use_latest_versions: true
-      run:
-        command: sleep inf
-        cpu: '0.01'
-        memory: 1Mi
-        #command: run-relay
-        #port: 3334
-        #port_protocol: udp
+
+  # Helper services
+  # Note: Until port support exists (T401994), build the image, but `jobs.yaml` will really deploy it
+  irc-relay-placeholder:
+    build:
+      repository: https://github.com/cluebotng/irc_relay.git
+      ref: v1.1.9
+      use_latest_versions: true
+    run:
+      command: sleep inf
+      cpu: '0.01'
+      memory: 1Mi
+      #command: run-relay
+      #port: 3334
+      #port_protocol: udp
 
   celery-flower:
     build:
