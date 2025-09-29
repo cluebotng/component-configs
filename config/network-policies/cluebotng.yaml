@@ -2,6 +2,7 @@
   match: irc-relay
   allow:
     - pod: bot
+    - pod: grafana-alloy
 
 - name: restrict-core
   match: core
