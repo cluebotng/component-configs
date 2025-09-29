@@ -34,9 +34,8 @@ components:
       use_latest_versions: true
     run:
       command: run-server
-      port: 3334
-      # Note: Once protocol support exists (T401994), until then check the TCP listener
-      # port_protocol: udp
+      port: 9334
+      health_check_http: /health
   celery-flower:
     build:
       reuse_from: cluebotng-reviewer
