@@ -199,7 +199,7 @@ def _get_web_services() -> Dict[str, WebServiceConfig]:
     }
 
 
-def _get_network_policies() -> Dict[str, WebServiceConfig]:
+def _get_network_policies() -> Dict[str, List[NetworkPolicy]]:
     config = {}
     config_path = PosixPath(__file__).parent / "config" / "network-policies"
     if config_path.is_dir():
@@ -471,9 +471,9 @@ def update_network_policies(_ctx):
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
 
-            if network_policies := network_policies.get(tool_name):
+            if tool_network_policies := network_policies.get(tool_name):
                 is_success = True
-                for network_policy in network_policies:
+                for network_policy in tool_network_policies:
                     is_success &= _ensure_kubernetes_object(
                         c, tool_name, network_policy
                     )
