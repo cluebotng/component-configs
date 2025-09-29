@@ -27,19 +27,16 @@ components:
       port: 6379
       mount: all
   # Helper services
-  # Note: Until port support exists (T401994), build the image, but `jobs.yaml` will really deploy it
-  irc-relay-placeholder:
+  irc-relay:
     build:
       repository: https://github.com/cluebotng/irc-relay.git
-      ref: v1.1.9
+      ref: feature/rewrite-to-async
       use_latest_versions: true
     run:
-      command: sleep inf
-      cpu: '0.01'
-      memory: 1Mi
-      #command: run-relay
-      #port: 3334
-      #port_protocol: udp
+      command: run-server
+      port: 3334
+      # Note: Once protocol support exists (T401994), until then check the TCP listener
+      # port_protocol: udp
   celery-flower:
     build:
       reuse_from: cluebotng-reviewer
