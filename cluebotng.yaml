@@ -10,6 +10,15 @@ components:
     run:
       command: redis-server
       port: 6379
+  irc-relay:
+    build:
+      repository: https://github.com/cluebotng/irc-relay.git
+      ref: feature/rewrite-to-async
+      use_latest_versions: true
+    run:
+      command: run-server
+      port: 9334
+      health_check_http: /health
   # Report interface
   report-interface:
     build:
