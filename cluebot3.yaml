@@ -7,5 +7,5 @@ components:
     run:
       command: run-bot
       memory: 1Gi
-      cpu: 3
+      cpu: '3'
       health_check_script: health-check

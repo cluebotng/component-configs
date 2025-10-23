@@ -9,7 +9,7 @@ components:
       command: ./cluebotng -l -m live_run
       port: 3565
       memory: 1Gi
-      cpu: 1
+      cpu: '1'
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
@@ -18,7 +18,7 @@ components:
     run:
       command: run-cbng
       memory: 2Gi
-      cpu: 3
+      cpu: '3'
       health_check_script: health-check
   # Supporting services
   redis:
