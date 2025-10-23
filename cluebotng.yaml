@@ -1,6 +1,25 @@
 components:
   # Core services - see utilities repo (until components-api is stable)
-
+  core:
+    build:
+      repository: https://github.com/cluebotng/external-core.git
+      ref: refs/tags/v0.0.2
+      use_latest_versions: true
+    run:
+      command: ./cluebotng -l -m live_run
+      port: 3565
+      memory: 1Gi
+      cpu: 1
+  bot:
+    build:
+      repository: https://github.com/cluebotng/bot.git
+      ref: refs/tags/v1.4.1
+      use_latest_versions: true
+    run:
+      command: run-cbng
+      memory: 2Gi
+      cpu: 3
+      health_check_script: health-check
   # Supporting services
   redis:
     build:
