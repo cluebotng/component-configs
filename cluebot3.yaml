@@ -1,0 +1,11 @@
+components:
+  cluebot3:
+    build:
+      repository: https://github.com/cluebotng/cluebot3.git
+      ref: refs/tags/v1.2.1
+      use_latest_versions: true
+    run:
+      command: run-bot
+      memory: 1Gi
+      cpu: 3
+      health_check_script: health-check

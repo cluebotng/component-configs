@@ -1,0 +1,55 @@
+name: 'cluebot3'
+on: { push: { branches: [ main ], paths: [ 'cluebot3.yaml', 'config/general.yaml', 'config/network-policies/cluebot3.yaml', 'config/web-services/cluebot3.yaml', '.github/workflows/cluebot3.yaml' ] }, workflow_dispatch: { } }
+concurrency:
+  group: cluebot3
+jobs:
+  update-network-policies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebot3'
+          task: update-network-policies
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  update-component-config:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebot3'
+          task: update-component-config
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  execute-deployment:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies, update-component-config]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebot3'
+          task: execute-deployment
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  update-webservice:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies, update-component-config, execute-deployment]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebot3'
+          task: update-webservice
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  dologmsg:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebot3'
+          task: dologmsg
+          argument: "--message='Deployment completed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'"
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
