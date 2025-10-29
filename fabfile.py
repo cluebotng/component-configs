@@ -290,10 +290,10 @@ def _dologmsg(tool_name: str, message: str):
         )
 
 
-def _start_deployment(tool_name: str, deploy_token: str) -> str:
+def _start_deployment(tool_name: str, deploy_token: str, force_run: bool, force_build: bool) -> str:
     r = requests.post(
         f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment",
-        params={"token": deploy_token},
+        params={"token": deploy_token, "force_run": force_run, "force_build": force_build},
     )
     r.raise_for_status()
     return r.json()["data"]["deploy_id"]
@@ -316,8 +316,8 @@ def _get_deployment_status(
     return r.json()["data"]["status"]
 
 
-def _execute_deployment(tool_name: str, deploy_token: str) -> bool:
-    deploy_id = _start_deployment(tool_name, deploy_token)
+def _execute_deployment(tool_name: str, deploy_token: str, force_run: bool, force_build: bool) -> bool:
+    deploy_id = _start_deployment(tool_name, deploy_token, force_run, force_build)
     if deploy_id is None:
         return False
 
@@ -432,7 +432,7 @@ def update_component_config(_ctx):
 
 
 @task()
-def execute_deployment(_ctx):
+def execute_deployment(_ctx, force_run: bool = False, force_build: bool = False):
     """Execute a component deployment for a tool account."""
     # This can also be done externally using the deploy token, unfortunately when using environments in Github
     # actions, the shared secrets are not passed through, so to avoid having to copy the key into every environment,
@@ -441,7 +441,7 @@ def execute_deployment(_ctx):
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
             if deploy_token := _get_deployment_token(c, tool_name):
-                if not _execute_deployment(tool_name, deploy_token):
+                if not _execute_deployment(tool_name, deploy_token, force_run, force_build):
                     print(f"Deployment failed for {tool_name}")
                     if TARGET_USER:
                         # If we are executing for a single tool, the exit with a failure code
