@@ -29,6 +29,7 @@ components:
       command: run-alloy
       port: 8118
       health_check_http: /health
+      mount: all
   pushgateway:
     build:
       repository: https://github.com/cluebotng/external-pushgateway.git
