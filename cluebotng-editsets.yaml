@@ -9,3 +9,4 @@ components:
       port: 8000
       replicas: 2
       health_check_http: /_/health
+      mount: all
