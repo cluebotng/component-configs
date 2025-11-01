@@ -1,5 +1,5 @@
 components:
-  syncer:
+  repository-syncer:
     build:
       repository: https://github.com/cluebotng/repository-syncer.git
       ref: refs/tags/v1.0.0
