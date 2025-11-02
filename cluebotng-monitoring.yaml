@@ -33,6 +33,7 @@ components:
       port: 3000
       health_check_http: /api/health
       replicas: 2
+      mount: all
   wiki-update-receiver:
     build:
       reuse_from: prometheus
