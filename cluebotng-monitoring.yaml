@@ -51,13 +51,4 @@ components:
       port: 8090
       health_check_http: /health
       replicas: 2
-  grafana-alloy:
-    build:
-      repository: https://github.com/cluebotng/external-grafana-alloy.git
-      ref: refs/tags/v0.4.2
-      use_latest_versions: true
-    run:
-      command: run-alloy
-      port: 8118
-      health_check_http: /health
       mount: all
