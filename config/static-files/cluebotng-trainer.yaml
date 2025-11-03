@@ -1,0 +1,3 @@
+- source: copy-kube-certs-to-env.sh
+  target: copy-kube-certs-to-env
+  mode: 750

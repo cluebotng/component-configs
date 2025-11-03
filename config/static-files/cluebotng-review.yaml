@@ -1,0 +1,3 @@
+- source: trove-mysql.sh
+  target: trove-mysql
+  mode: 750

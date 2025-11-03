@@ -1,0 +1,3 @@
+- source: copy-worker-credentials-to-env.sh
+  target: copy-worker-credentials-to-env
+  mode: 750

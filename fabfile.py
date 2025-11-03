@@ -144,6 +144,32 @@ class NetworkPolicy:
         )
 
 
+@dataclasses.dataclass
+class StaticFile:
+    source: str
+    target: str
+    mode: str
+
+    def load(self) -> str:
+        path = (
+            PosixPath(__file__).parent
+            / "config"
+            / "static-files"
+            / "files"
+            / self.source
+        )
+        with path.open("r") as fh:
+            return fh.read()
+
+    @staticmethod
+    def from_values(data: Dict[str, Any]) -> "StaticFile":
+        return StaticFile(
+            source=data.get("source"),
+            target=data.get("target"),
+            mode=data.get("mode", "0600"),
+        )
+
+
 def _get_head_ref() -> Optional[str]:
     r = requests.get(
         "https://api.github.com/repos/cluebotng/component-configs/git/refs"
@@ -219,6 +245,26 @@ def _get_network_policies() -> Dict[str, List[NetworkPolicy]]:
     }
 
 
+def _get_static_files() -> Dict[str, List[StaticFile]]:
+    config = {}
+    config_path = PosixPath(__file__).parent / "config" / "static-files"
+    if config_path.is_dir():
+        for path in config_path.glob("*.yaml"):
+            with path.open("r") as fh:
+                config.update(
+                    {
+                        path.name.split(".yaml")[0]: yaml.load(
+                            fh.read(), Loader=yaml.SafeLoader
+                        )
+                    }
+                )
+
+    return {
+        tool_name: [StaticFile.from_values(config) for config in entries]
+        for tool_name, entries in config.items()
+    }
+
+
 def _setup_component_configs(c: Connection, tool_name: str):
     with (PosixPath(__name__).parent / f"{tool_name}.yaml").open("r") as fh:
         config = fh.read()
@@ -271,13 +317,34 @@ def _delete_kubernetes_object(c: Connection, obj_type: str, obj_name: str) -> bo
 
 def _ensure_kubernetes_object(
     c: Connection, tool_name: str, obj: WebServiceConfig | NetworkPolicy
-):
+) -> bool:
     if hasattr(obj, "delete") and obj.delete:
         return _delete_kubernetes_object(c, obj.k8s_type, obj.name)
 
     # Whack the object into the cluster
     print(f"Applying to {tool_name}: {obj}")
     return _apply_kubernetes_object(c, obj.as_k8s_object())
+
+
+def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) -> bool:
+    contents = static_file.load()
+    encoded_contents = base64.b64encode(contents.encode("utf-8")).decode("utf-8")
+    target_path = TOOL_BASE_DIR / tool_name / static_file.target
+
+    print(
+        f"Writing {static_file.source} to {target_path.absolute()} ({static_file.mode})"
+    )
+    ret = c.sudo(
+        f'bash -c "'
+        f"mkdir -p '{target_path.parent}' &&"
+        f"base64 -d <<<'{encoded_contents}' > '{target_path}' && "
+        f"chmod {static_file.mode} '{target_path}'"
+        f'"',
+        hide="both",
+    )
+    if ret.exited != 0:
+        print(f"file write failed: {ret.stdout} / {ret.stderr}")
+    return ret.exited == 0
 
 
 def _dologmsg(tool_name: str, message: str):
@@ -290,10 +357,16 @@ def _dologmsg(tool_name: str, message: str):
         )
 
 
-def _start_deployment(tool_name: str, deploy_token: str, force_run: bool, force_build: bool) -> str:
+def _start_deployment(
+    tool_name: str, deploy_token: str, force_run: bool, force_build: bool
+) -> str:
     r = requests.post(
         f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment",
-        params={"token": deploy_token, "force_run": force_run, "force_build": force_build},
+        params={
+            "token": deploy_token,
+            "force_run": force_run,
+            "force_build": force_build,
+        },
     )
     r.raise_for_status()
     return r.json()["data"]["deploy_id"]
@@ -316,7 +389,9 @@ def _get_deployment_status(
     return r.json()["data"]["status"]
 
 
-def _execute_deployment(tool_name: str, deploy_token: str, force_run: bool, force_build: bool) -> bool:
+def _execute_deployment(
+    tool_name: str, deploy_token: str, force_run: bool, force_build: bool
+) -> bool:
     deploy_id = _start_deployment(tool_name, deploy_token, force_run, force_build)
     if deploy_id is None:
         return False
@@ -441,7 +516,9 @@ def execute_deployment(_ctx, force_run: bool = False, force_build: bool = False)
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
             if deploy_token := _get_deployment_token(c, tool_name):
-                if not _execute_deployment(tool_name, deploy_token, force_run, force_build):
+                if not _execute_deployment(
+                    tool_name, deploy_token, force_run, force_build
+                ):
                     print(f"Deployment failed for {tool_name}")
                     if TARGET_USER:
                         # If we are executing for a single tool, the exit with a failure code
@@ -485,10 +562,30 @@ def update_network_policies(_ctx):
 
 
 @task()
+def update_static_files(_ctx):
+    """Execute a static file deployment for a tool account."""
+    static_files = _get_static_files()
+    for tool_name in _get_target_tools():
+        if TARGET_USER is None or tool_name == TARGET_USER:
+            c = _get_connection_for_tool(tool_name)
+
+            if tool_static_files := static_files.get(tool_name):
+                is_success = True
+                for static_file in tool_static_files:
+                    is_success &= _ensure_static_file(c, tool_name, static_file)
+                if not is_success:
+                    print(f"Deployment failed for {tool_name}")
+                    if TARGET_USER:
+                        # If we are executing for a single tool, the exit with a failure code
+                        sys.exit(1)
+
+
+@task()
 def deploy(ctx):
     update_network_policies(ctx)
     execute_deployment(ctx)
     update_webservice(ctx)
+    update_static_files(ctx)
 
 
 @task()
