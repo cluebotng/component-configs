@@ -583,6 +583,7 @@ def update_static_files(_ctx):
 @task()
 def deploy(ctx):
     update_network_policies(ctx)
+    update_component_config(ctx)
     execute_deployment(ctx)
     update_webservice(ctx)
     update_static_files(ctx)
