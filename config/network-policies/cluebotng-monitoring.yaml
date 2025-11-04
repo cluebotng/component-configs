@@ -9,6 +9,7 @@
     - namespace: tool-cluebotng
     - namespace: tool-cluebotng-review
     - namespace: tool-cluebotng-staging
+    - namespace: tool-toolforge-functional-runner
 
 - name: restrict-alertmanager
   match: alertmanager
