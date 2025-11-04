@@ -1,0 +1,21 @@
+components:
+  runner:
+    build:
+      repository: https://github.com/DamianZaremba/toolforge-functional-runner.git
+      ref: refs/tags/v1.0.0
+      use_latest_versions: true
+    run:
+      command: run
+      port: 9091
+      replicas: 1
+      health_check_http: /
+  grafana-alloy:
+    build:
+      repository: https://github.com/cluebotng/external-grafana-alloy.git
+      ref: refs/tags/v0.4.2
+      use_latest_versions: true
+    run:
+      command: run-alloy
+      port: 8118
+      health_check_http: /health
+      mount: all

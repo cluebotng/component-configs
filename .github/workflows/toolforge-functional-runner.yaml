@@ -1,0 +1,55 @@
+name: 'toolforge-functional-runner'
+on: { push: { branches: [ main ], paths: [ 'toolforge-functional-runner.yaml', 'config/general.yaml', 'config/network-policies/toolforge-functional-runner.yaml', 'config/web-services/toolforge-functional-runner.yaml', '.github/workflows/toolforge-functional-runner.yaml' ] }, workflow_dispatch: { } }
+concurrency:
+  group: toolforge-functional-runner
+jobs:
+  update-network-policies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'toolforge-functional-runner'
+          task: update-network-policies
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  update-component-config:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'toolforge-functional-runner'
+          task: update-component-config
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  execute-deployment:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies, update-component-config]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'toolforge-functional-runner'
+          task: execute-deployment
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  update-webservice:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies, update-component-config, execute-deployment]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'toolforge-functional-runner'
+          task: update-webservice
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  dologmsg:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'toolforge-functional-runner'
+          task: dologmsg
+          argument: "--message='Deployment completed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'"
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
