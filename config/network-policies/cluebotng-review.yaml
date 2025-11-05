@@ -13,6 +13,11 @@
   allow:
     - namespace: tool-cluebotng-review
 
+- name: restrict-core
+  match: core
+  allow:
+    - namespace: tool-cluebotng-review
+
 # Cleanup
 - name: limit-access-irc-relay
   delete: True

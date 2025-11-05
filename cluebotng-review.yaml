@@ -64,6 +64,16 @@ components:
       port: 9091
       health_check_http: /-/healthy
       mount: all
+  core:
+    build:
+      repository: https://github.com/cluebotng/external-core.git
+      ref: refs/tags/v0.0.2
+      use_latest_versions: true
+    run:
+      command: ./cluebotng -l -m live_run
+      port: 3565
+      memory: 1Gi
+      cpu: '1'
   # Scheduled jobs
 
   ## Core jobs
