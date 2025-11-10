@@ -2,49 +2,57 @@ components:
   # Core services
   prometheus:
     build:
-      repository: https://github.com/cluebotng/monitoring.git
-      ref: refs/tags/v2.7.1
+      repository: https://github.com/cluebotng/monitoring-prometheus.git
+      ref: refs/tags/v1.0.0
       use_latest_versions: true
     run:
-      command: run-prometheus
+      command: prometheus
       port: 9090
       health_check_http: /-/healthy
       mount: all
   alertmanager:
     build:
-      reuse_from: prometheus
+      repository: https://github.com/cluebotng/monitoring-alertmanager.git
+      ref: refs/tags/v1.0.0
+      use_latest_versions: true
     run:
-      command: run-alert-manager
+      command: alertmanager
       port: 9093
       health_check_http: /-/healthy
       mount: all
   blackbox-exporter:
     build:
-      reuse_from: prometheus
+      repository: https://github.com/cluebotng/monitoring-blackbox-exporter.git
+      ref: refs/tags/v1.0.0
+      use_latest_versions: true
     run:
-      command: run-blackbox-exporter
+      command: blackbox-exporter
       port: 9115
       replicas: 2
   grafana:
     build:
-      reuse_from: prometheus
+      repository: https://github.com/cluebotng/monitoring-grafana.git
+      ref: refs/tags/v1.0.0
+      use_latest_versions: true
     run:
-      command: run-grafana
+      command: grafana
       port: 3000
       health_check_http: /api/health
       replicas: 2
       mount: all
   wiki-update-receiver:
     build:
-      reuse_from: prometheus
+      repository: https://github.com/cluebotng/monitoring-wiki-update-receiver.git
+      ref: refs/tags/v1.0.0
+      use_latest_versions: true
     run:
-      command: run-updater
+      command: run-api
       port: 8900
       health_check_http: /health
       replicas: 2
   checker:
     build:
-      repository: https://github.com/cluebotng/monitoring-probes.git
+      repository: https://github.com/cluebotng/monitoring-checker.git
       ref: refs/tags/v1.3.0
       use_latest_versions: true
     run:
