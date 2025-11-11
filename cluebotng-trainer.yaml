@@ -12,7 +12,7 @@ components:
   file-api:
     build:
       repository: https://github.com/cluebotng/fileserver.git
-      ref: refs/tags/v0.0.3
+      ref: refs/tags/v0.0.4
       use_latest_versions: true
     run:
       command: run-fileserver
