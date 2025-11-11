@@ -42,7 +42,7 @@ jobs:
           user: 'cluebotng-review'
           task: update-webservice
           ssh_key: ${{ secrets.CI_SSH_KEY }}
-  dologmsg:
+  dologmsg-success:
     runs-on: ubuntu-latest
     needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]
     steps:
@@ -52,4 +52,16 @@ jobs:
           user: 'cluebotng-review'
           task: dologmsg
           argument: "--message='Deployment completed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'"
+          ssh_key: ${{ secrets.CI_SSH_KEY }}
+  dologmsg-failure:
+    runs-on: ubuntu-latest
+    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]
+    if: ${{ failure() }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cluebotng/ci-execute-fabric@main
+        with:
+          user: 'cluebotng-review'
+          task: dologmsg
+          argument: "--message='Deployment failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'"
           ssh_key: ${{ secrets.CI_SSH_KEY }}
