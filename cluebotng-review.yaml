@@ -20,7 +20,7 @@ components:
   redis:
     build:
       repository: https://github.com/cluebotng/external-redis.git
-      ref: refs/tags/v1.0.1
+      ref: refs/tags/v1.0.3
       use_latest_versions: true
     run:
       command: redis-server
