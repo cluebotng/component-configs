@@ -6,7 +6,7 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/botng.git
-      ref: v0.0.39
+      ref: refs/tags/v0.0.40
       use_latest_versions: true
     run:
       command: botng --irc-relay --debug
