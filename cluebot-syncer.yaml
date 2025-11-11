@@ -2,7 +2,7 @@ components:
   repository-syncer:
     build:
       repository: https://github.com/cluebotng/repository-syncer.git
-      ref: refs/tags/v1.1.4
+      ref: refs/tags/v1.1.6
       use_latest_versions: true
     run:
       schedule: '*/15 * * * *'
