@@ -13,7 +13,7 @@ components:
   alertmanager:
     build:
       repository: https://github.com/cluebotng/monitoring-alertmanager.git
-      ref: refs/tags/v1.0.0
+      ref: refs/tags/v1.0.1
       use_latest_versions: true
     run:
       command: alertmanager
