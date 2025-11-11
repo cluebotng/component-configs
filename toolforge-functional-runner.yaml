@@ -2,7 +2,7 @@ components:
   runner:
     build:
       repository: https://github.com/DamianZaremba/toolforge-functional-runner.git
-      ref: refs/tags/v1.0.0
+      ref: refs/tags/v1.1.1
       use_latest_versions: true
     run:
       command: run
