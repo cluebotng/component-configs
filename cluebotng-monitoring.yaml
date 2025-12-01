@@ -3,7 +3,7 @@ components:
   prometheus:
     build:
       repository: https://github.com/cluebotng/monitoring-prometheus.git
-      ref: refs/tags/v1.1.0
+      ref: refs/tags/v1.1.5
       use_latest_versions: true
     run:
       command: prometheus
