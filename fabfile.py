@@ -3,11 +3,13 @@ import dataclasses
 import os
 import sys
 import time
+
 import yaml
 from pathlib import PosixPath
 from typing import List, Optional, Dict, Any
 
 import requests
+from requests.exceptions import HTTPError
 from fabric import Connection, Config, task
 
 
@@ -167,6 +169,26 @@ class StaticFile:
             source=data.get("source"),
             target=data.get("target"),
             mode=data.get("mode", "0600"),
+        )
+
+
+def _raise_for_status_with_no_url(response: requests.Response) -> None:
+    if isinstance(response.reason, bytes):
+        try:
+            reason = response.reason.decode("utf-8")
+        except UnicodeDecodeError:
+            reason = response.reason.decode("iso-8859-1")
+    else:
+        reason = response.reason
+
+    if 400 <= response.status_code < 500:
+        raise HTTPError(
+            f"{response.status_code} Client Error: {reason}", response=response
+        )
+
+    elif 500 <= response.status_code < 600:
+        raise HTTPError(
+            f"{response.status_code} Server Error: {reason}", response=response
         )
 
 
@@ -368,7 +390,7 @@ def _start_deployment(
             "force_build": force_build,
         },
     )
-    r.raise_for_status()
+    _raise_for_status_with_no_url(r)
     return r.json()["data"]["deploy_id"]
 
 
@@ -385,7 +407,7 @@ def _get_deployment_status(
         )
         return None
 
-    r.raise_for_status()
+    _raise_for_status_with_no_url(r)
     return r.json()["data"]["status"]
 
 
@@ -415,13 +437,13 @@ def _execute_deployment(
 def _generate_workflow(tool_name: str):
     # We do this to avoid `yaml` as a dep, it's simple enough
     config = f"name: '{tool_name}'\n"
-    config += f"on: {{ push: {{ branches: [ main ], paths: [ "
+    config += "on: { push: { branches: [ main ], paths: [ "
     config += f"'{tool_name}.yaml', "
     config += "'config/general.yaml', "
     config += f"'config/network-policies/{tool_name}.yaml', "
     config += f"'config/web-services/{tool_name}.yaml', "
     config += f"'.github/workflows/{tool_name}.yaml' "
-    config += f"] }}, workflow_dispatch: {{ }} }}\n"
+    config += "] }, workflow_dispatch: { } }\n"
     config += f"concurrency:\n  group: {tool_name}\n"
     config += "jobs:\n"
     # Until T401868 is resolved, update the tool with the config we want deployed
