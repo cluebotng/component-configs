@@ -381,7 +381,7 @@ def _dologmsg(tool_name: str, message: str):
 
 def _start_deployment(
     tool_name: str, deploy_token: str, force_run: bool, force_build: bool
-) -> str:
+) -> Optional[str]:
     r = requests.post(
         f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment",
         params={
@@ -390,23 +390,21 @@ def _start_deployment(
             "force_build": force_build,
         },
     )
-    _raise_for_status_with_no_url(r)
-    return r.json()["data"]["deploy_id"]
-
-
-def _get_deployment_status(
-    tool_name: str, deploy_id: str, deploy_token: str
-) -> Optional[str]:
-    r = requests.get(
-        f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment/{deploy_id}",
-        params={"token": deploy_token},
-    )
     if r.status_code == 409:
         print(
             f"Deployment already in progress for {tool_name} - multiple/queueing not supported currently!"
         )
         return None
 
+    _raise_for_status_with_no_url(r)
+    return r.json()["data"]["deploy_id"]
+
+
+def _get_deployment_status(tool_name: str, deploy_id: str, deploy_token: str) -> str:
+    r = requests.get(
+        f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment/{deploy_id}",
+        params={"token": deploy_token},
+    )
     _raise_for_status_with_no_url(r)
     return r.json()["data"]["status"]
 
