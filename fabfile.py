@@ -523,6 +523,19 @@ def _generate_workflow(tool_name: str):
 
 
 @task()
+def rotate_deployment_token(_ctx):
+    """Rotate the deployment token"""
+    for tool_name in _get_target_tools():
+        if TARGET_USER is None or tool_name == TARGET_USER:
+            c = _get_connection_for_tool(tool_name)
+            c.sudo(
+                f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components deploy-token refresh --yes-im-sure",
+                hide="both",
+            )
+            print(f"Rotated deployment token for {tool_name}")
+
+
+@task()
 def create_workflows(_ctx):
     """Generate Github workflows for each tool"""
     for tool_name in _get_target_tools():
@@ -537,8 +550,8 @@ def create_workflows(_ctx):
 def update_component_config(_ctx):
     """Ensure the tool accounts have a component config setup."""
     for tool_name in _get_target_tools():
-        c = _get_connection_for_tool(tool_name)
         if TARGET_USER is None or tool_name == TARGET_USER:
+            c = _get_connection_for_tool(tool_name)
             print(f"Applying config for {tool_name}")
             _setup_component_configs(c, tool_name)
 
