@@ -42,7 +42,7 @@ components:
   report-interface:
     build:
       repository: https://github.com/cluebotng/report.git
-      ref: refs/tags/v1.7.3
+      ref: refs/tags/v1.8.0
       use_latest_versions: true
     run:
       command: web
