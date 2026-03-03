@@ -19,10 +19,21 @@ EMIT_LOG_MESSAGES = os.environ.get("EMIT_LOG_MESSAGES", "true") == "true"
 
 
 @dataclasses.dataclass
-class WebServiceConfig:
+class WebServiceIngressConfig:
     tool_name: str
     target_component: str
     target_port: int
+
+    def __str__(self) -> str:
+        return f"Ingress(backend={self.target_component}, port={self.target_port})"
+
+    @staticmethod
+    def from_values(tool_name: str, data: Dict[str, Any]) -> "WebServiceIngressConfig":
+        return WebServiceIngressConfig(
+            tool_name=tool_name,
+            target_component=data.get("component"),
+            target_port=data.get("port"),
+        )
 
     def as_k8s_object(self) -> Dict[str, Any]:
         return {
@@ -31,8 +42,10 @@ class WebServiceConfig:
             "metadata": {
                 "name": f"{self.tool_name}-subdomain",
                 "labels": {
-                    "name": self.tool_name,
+                    "app.kubernetes.io/component": "web",
+                    "app.kubernetes.io/managed-by": "component-configs",
                     "toolforge": "tool",
+                    "name": self.tool_name,
                 },
             },
             "spec": {
@@ -59,16 +72,51 @@ class WebServiceConfig:
             },
         }
 
+
+@dataclasses.dataclass
+class WebServiceHttpRouteConfig:
+    tool_name: str
+    target_component: str
+    target_port: int
+
     def __str__(self) -> str:
-        return f"Ingress(backend={self.target_component}, port={self.target_port})"
+        return f"HttpRoute(backend={self.target_component}, port={self.target_port})"
 
     @staticmethod
-    def from_values(tool_name: str, data: Dict[str, Any]) -> "WebServiceConfig":
-        return WebServiceConfig(
+    def from_values(
+        tool_name: str, data: Dict[str, Any]
+    ) -> "WebServiceHttpRouteConfig":
+        return WebServiceHttpRouteConfig(
             tool_name=tool_name,
             target_component=data.get("component"),
             target_port=data.get("port"),
         )
+
+    def as_k8s_object(self) -> Dict[str, Any]:
+        return {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "HTTPRoute",
+            "metadata": {
+                "name": self.tool_name,
+                "labels": {
+                    "app.kubernetes.io/component": "web",
+                    "app.kubernetes.io/managed-by": "component-configs",
+                    "toolforge": "tool",
+                    "name": self.tool_name,
+                },
+            },
+            "spec": {
+                "parentRefs": [{"namespace": "istio-gateway", "name": "toolforge"}],
+                "hostnames": [f"{self.tool_name}.toolforge.org"],
+                "rules": [
+                    {
+                        "backendRefs": [
+                            {"name": self.target_component, "port": self.target_port}
+                        ]
+                    }
+                ],
+            },
+        }
 
 
 @dataclasses.dataclass
@@ -227,7 +275,9 @@ def _get_target_tools() -> List[str]:
     ]
 
 
-def _get_web_services() -> Dict[str, WebServiceConfig]:
+def _get_web_services() -> (
+    Dict[str, List[WebServiceHttpRouteConfig | WebServiceIngressConfig]]
+):
     config = {}
     config_path = PosixPath(__file__).parent / "config" / "web-services"
     if config_path.is_dir():
@@ -242,7 +292,11 @@ def _get_web_services() -> Dict[str, WebServiceConfig]:
                 )
 
     return {
-        tool_name: WebServiceConfig.from_values(tool_name, config)
+        tool_name: [
+            WebServiceIngressConfig.from_values(tool_name, config),
+            # After https://gitlab.wikimedia.org/repos/cloud/toolforge/maintain-kubeusers/-/merge_requests/83
+            # WebServiceHttpRouteConfig.from_values(tool_name, config)
+        ]
         for tool_name, config in config.items()
     }
 
@@ -338,7 +392,9 @@ def _delete_kubernetes_object(c: Connection, obj_type: str, obj_name: str) -> bo
 
 
 def _ensure_kubernetes_object(
-    c: Connection, tool_name: str, obj: WebServiceConfig | NetworkPolicy
+    c: Connection,
+    tool_name: str,
+    obj: WebServiceHttpRouteConfig | WebServiceIngressConfig | NetworkPolicy,
 ) -> bool:
     if hasattr(obj, "delete") and obj.delete:
         return _delete_kubernetes_object(c, obj.k8s_type, obj.name)
@@ -580,7 +636,7 @@ def update_webservice(_ctx):
     for tool_name in _get_target_tools():
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
-            if webservice := webservices.get(tool_name):
+            for webservice in webservices.get(tool_name, []):
                 if not _ensure_kubernetes_object(c, tool_name, webservice):
                     print(f"Deployment failed for {tool_name}")
                     if TARGET_USER:
