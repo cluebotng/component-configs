@@ -294,8 +294,7 @@ def _get_web_services() -> (
     return {
         tool_name: [
             WebServiceIngressConfig.from_values(tool_name, config),
-            # After https://gitlab.wikimedia.org/repos/cloud/toolforge/maintain-kubeusers/-/merge_requests/83
-            # WebServiceHttpRouteConfig.from_values(tool_name, config)
+            WebServiceHttpRouteConfig.from_values(tool_name, config)
         ]
         for tool_name, config in config.items()
     }
