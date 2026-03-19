@@ -294,7 +294,7 @@ def _get_web_services() -> (
     return {
         tool_name: [
             WebServiceIngressConfig.from_values(tool_name, config),
-            WebServiceHttpRouteConfig.from_values(tool_name, config)
+            WebServiceHttpRouteConfig.from_values(tool_name, config),
         ]
         for tool_name, config in config.items()
     }
@@ -487,6 +487,12 @@ def _execute_deployment(
         return False
 
 
+def _show_deployment(c: Connection, tool_name: str, deploy_token: str) -> None:
+    c.sudo(
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components deployment show '{deploy_token}'",
+    )
+
+
 def _generate_workflow(tool_name: str):
     # We do this to avoid `yaml` as a dep, it's simple enough
     config = f"name: '{tool_name}'\n"
@@ -625,6 +631,7 @@ def execute_deployment(_ctx, force_run: bool = False, force_build: bool = False)
                     print(f"Deployment failed for {tool_name}")
                     if TARGET_USER:
                         # If we are executing for a single tool, the exit with a failure code
+                        _show_deployment(c, tool_name, deploy_token)
                         sys.exit(1)
 
 
