@@ -466,17 +466,17 @@ def _get_deployment_status(tool_name: str, deploy_id: str, deploy_token: str) ->
 
 def _execute_deployment(
     tool_name: str, deploy_token: str, force_run: bool, force_build: bool
-) -> bool:
+) -> tuple[str | None, bool]:
     deploy_id = _start_deployment(tool_name, deploy_token, force_run, force_build)
     if deploy_id is None:
-        return False
+        return None, False
 
     print(f"Started deployment: {deploy_id}")
     while True:
         deployment_status = _get_deployment_status(tool_name, deploy_id, deploy_token)
         if deployment_status == "successful":
             print("Deployment has finished successfully")
-            return True
+            return deploy_id, True
 
         if deployment_status in ["pending", "running"]:
             print("Deployment is pending or in progress")
@@ -484,7 +484,7 @@ def _execute_deployment(
             continue
 
         print("Deployment is not pending, running or successful; probably failed")
-        return False
+        return deploy_id, False
 
 
 def _show_deployment(c: Connection, tool_name: str, deploy_token: str) -> None:
@@ -625,13 +625,14 @@ def execute_deployment(_ctx, force_run: bool = False, force_build: bool = False)
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
             if deploy_token := _get_deployment_token(c, tool_name):
-                if not _execute_deployment(
+                deploy_id, deploy_success = _execute_deployment(
                     tool_name, deploy_token, force_run, force_build
-                ):
-                    print(f"Deployment failed for {tool_name}")
+                )
+                if not deploy_success:
+                    print(f"Deployment failed for {tool_name} ({deploy_id})")
                     if TARGET_USER:
                         # If we are executing for a single tool, the exit with a failure code
-                        _show_deployment(c, tool_name, deploy_token)
+                        _show_deployment(c, tool_name, deploy_id)
                         sys.exit(1)
 
 
