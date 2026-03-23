@@ -9,6 +9,7 @@ components:
       command: web
       port: 8000
       replicas: 2
+      memory: 2Gi
       health_check_http: /internal/health/
   celery-worker:
     build:
@@ -16,6 +17,7 @@ components:
     run:
       command: run-celery
       replicas: 2
+      memory: 2Gi
   # Runtime dependencies
   redis:
     build:
@@ -72,8 +74,6 @@ components:
     run:
       command: ./cluebotng -l -m live_run
       port: 3565
-      memory: 1Gi
-      cpu: '1'
   # Scheduled jobs
 
   ## Core jobs
