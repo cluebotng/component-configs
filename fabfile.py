@@ -503,7 +503,7 @@ def _generate_workflow(tool_name: str):
     config += f"'config/web-services/{tool_name}.yaml', "
     config += f"'.github/workflows/{tool_name}.yaml' "
     config += "] }, workflow_dispatch: { } }\n"
-    config += f"concurrency:\n  group: {tool_name}\n"
+    config += "concurrency:\n  group: global\n"
     config += "jobs:\n"
     # Until T401868 is resolved, update the tool with the config we want deployed
     # Note: the config will not be re-fetched as `source_url` cannot be rewritten on the same sha... so this is '1 off'

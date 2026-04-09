@@ -1,7 +1,7 @@
 name: 'cluebotng'
 on: { push: { branches: [ main ], paths: [ 'cluebotng.yaml', 'config/general.yaml', 'config/network-policies/cluebotng.yaml', 'config/web-services/cluebotng.yaml', '.github/workflows/cluebotng.yaml' ] }, workflow_dispatch: { } }
 concurrency:
-  group: cluebotng
+  group: global
 jobs:
   update-network-policies:
     runs-on: ubuntu-latest

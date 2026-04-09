@@ -1,7 +1,7 @@
 name: 'cluebot-syncer'
 on: { push: { branches: [ main ], paths: [ 'cluebot-syncer.yaml', 'config/general.yaml', 'config/network-policies/cluebot-syncer.yaml', 'config/web-services/cluebot-syncer.yaml', '.github/workflows/cluebot-syncer.yaml' ] }, workflow_dispatch: { } }
 concurrency:
-  group: cluebot-syncer
+  group: global
 jobs:
   update-network-policies:
     runs-on: ubuntu-latest
