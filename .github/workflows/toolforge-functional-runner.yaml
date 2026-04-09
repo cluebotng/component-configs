@@ -1,7 +1,7 @@
 name: 'toolforge-functional-runner'
 on: { push: { branches: [ main ], paths: [ 'toolforge-functional-runner.yaml', 'config/general.yaml', 'config/network-policies/toolforge-functional-runner.yaml', 'config/web-services/toolforge-functional-runner.yaml', '.github/workflows/toolforge-functional-runner.yaml' ] }, workflow_dispatch: { } }
 concurrency:
-  group: global
+  group: toolforge-functional-runner
 jobs:
   update-network-policies:
     runs-on: ubuntu-latest
