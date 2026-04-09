@@ -8,7 +8,7 @@ components:
     run:
       command: prometheus
       port: 9090
-      health_check_http: /-/healthy
+      #health_check_http: /-/healthy
       mount: all
   alertmanager:
     build:
@@ -18,7 +18,7 @@ components:
     run:
       command: alertmanager
       port: 9093
-      health_check_http: /-/healthy
+      #health_check_http: /-/healthy
       mount: all
   blackbox-exporter:
     build:
@@ -37,7 +37,7 @@ components:
     run:
       command: grafana
       port: 3000
-      health_check_http: /api/health
+      #health_check_http: /api/health
       replicas: 2
       mount: all
   wiki-update-receiver:
@@ -48,7 +48,7 @@ components:
     run:
       command: run-api
       port: 8900
-      health_check_http: /health
+      #health_check_http: /health
       replicas: 2
   checker:
     build:
@@ -58,6 +58,6 @@ components:
     run:
       command: run-checker
       port: 8090
-      health_check_http: /health
+      #health_check_http: /health
       replicas: 2
       mount: all
