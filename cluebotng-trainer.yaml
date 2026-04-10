@@ -40,3 +40,13 @@ components:
       port: 9091
       health_check_http: /-/healthy
       mount: all
+  ## Cleanup
+  prune-runs:
+    build:
+      repository: https://github.com/cluebotng/external-utilities.git
+      ref: refs/tags/v1.0.9
+      use_latest_versions: true
+    run:
+      command: bash -c 'find "/data/project/cluebotng-trainer/public_html" -type f -mtime +7 -delete'
+      schedule: '30 2 * * *'
+      mount: all
