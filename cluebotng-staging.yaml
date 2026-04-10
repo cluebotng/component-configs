@@ -7,7 +7,6 @@ components:
     build:
       repository: https://github.com/cluebotng/botng.git
       ref: refs/tags/v0.0.42
-      use_latest_versions: true
     run:
       command: botng --irc-relay --debug
       port: 8118
@@ -16,7 +15,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-core.git
       ref: refs/tags/v0.0.13
-      use_latest_versions: true
     run:
       command: ./cluebotng -l -m live_run
       port: 3565
@@ -25,7 +23,6 @@ components:
     build:
       repository: https://github.com/cluebotng/report.git
       ref: refs/tags/v1.9.3
-      use_latest_versions: true
     run:
       command: web
       port: 8000
@@ -35,7 +32,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v0.4.11
-      use_latest_versions: true
     run:
       command: run-alloy
       port: 8118
@@ -45,7 +41,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-redis.git
       ref: refs/tags/v1.0.9
-      use_latest_versions: true
     run:
       command: redis-server
       port: 6379

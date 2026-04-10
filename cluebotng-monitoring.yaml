@@ -4,7 +4,6 @@ components:
     build:
       repository: https://github.com/cluebotng/monitoring-prometheus.git
       ref: refs/tags/v1.1.54
-      use_latest_versions: true
     run:
       command: prometheus
       port: 9090
@@ -14,7 +13,6 @@ components:
     build:
       repository: https://github.com/cluebotng/monitoring-alertmanager.git
       ref: refs/tags/v1.0.54
-      use_latest_versions: true
     run:
       command: alertmanager
       port: 9093
@@ -24,7 +22,6 @@ components:
     build:
       repository: https://github.com/cluebotng/monitoring-blackbox-exporter.git
       ref: refs/tags/v1.0.9
-      use_latest_versions: true
     run:
       command: blackbox-exporter
       port: 9115
@@ -33,7 +30,6 @@ components:
     build:
       repository: https://github.com/cluebotng/monitoring-grafana.git
       ref: refs/tags/v1.0.57
-      use_latest_versions: true
     run:
       command: grafana
       port: 3000
@@ -44,7 +40,6 @@ components:
     build:
       repository: https://github.com/cluebotng/monitoring-wiki-update-receiver.git
       ref: refs/tags/v1.0.56
-      use_latest_versions: true
     run:
       command: run-api
       port: 8900
@@ -54,7 +49,6 @@ components:
     build:
       repository: https://github.com/cluebotng/monitoring-checker.git
       ref: refs/tags/v1.3.5
-      use_latest_versions: true
     run:
       command: run-checker
       port: 8090

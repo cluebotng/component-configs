@@ -3,7 +3,6 @@ components:
     build:
       repository: https://github.com/DamianZaremba/toolforge-functional-runner.git
       ref: refs/tags/v1.1.4
-      use_latest_versions: true
     run:
       command: run
       port: 9091
@@ -13,7 +12,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v0.4.11
-      use_latest_versions: true
     run:
       command: run-alloy
       port: 8118

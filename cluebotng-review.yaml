@@ -4,7 +4,6 @@ components:
     build:
       repository: https://github.com/cluebotng/reviewer.git
       ref: refs/tags/v0.20.1
-      use_latest_versions: true
     run:
       command: web
       port: 8000
@@ -23,7 +22,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-redis.git
       ref: refs/tags/v1.0.9
-      use_latest_versions: true
     run:
       command: redis-server
       port: 6379
@@ -33,7 +31,6 @@ components:
     build:
       repository: https://github.com/cluebotng/irc-relay.git
       ref: refs/tags/v2.0.67
-      use_latest_versions: true
     run:
       command: run-server
       port: 9334
@@ -50,7 +47,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v0.4.11
-      use_latest_versions: true
     run:
       command: run-alloy
       port: 8118
@@ -60,7 +56,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-pushgateway.git
       ref: refs/tags/v0.0.4
-      use_latest_versions: true
     run:
       command: run-pushgateway
       port: 9091
@@ -70,7 +65,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-core.git
       ref: refs/tags/v0.0.13
-      use_latest_versions: true
     run:
       command: ./cluebotng -l -m live_run
       port: 3565
@@ -164,7 +158,6 @@ components:
     build:
       repository: https://github.com/cluebotng/external-utilities.git
       ref: refs/tags/v1.0.9
-      use_latest_versions: true
     run:
       command: bash -c 'mkdir -p /data/project/cluebotng-review/mysql_backups/ && mysqldump --disable-ssl -h $TOOL_DB_HOST -u $TOOL_DB_USER -p$TOOL_DB_PASSWORD $TOOL_DB_SCHEMA | gzip -9 > /data/project/cluebotng-review/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
       schedule: '45 */2 * * *'
