@@ -3,7 +3,7 @@ components:
   cluebotng-reviewer:
     build:
       repository: https://github.com/cluebotng/reviewer.git
-      ref: refs/tags/v0.21.2
+      ref: refs/tags/v0.21.3
     run:
       command: web
       port: 8000
