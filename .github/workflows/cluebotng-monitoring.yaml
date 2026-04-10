@@ -5,6 +5,7 @@ concurrency:
 jobs:
   update-network-policies:
     runs-on: ubuntu-latest
+    concurrency: global-ssh
     steps:
       - uses: actions/checkout@v6
       - uses: cluebotng/ci-execute-fabric@main
@@ -14,6 +15,7 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   update-component-config:
     runs-on: ubuntu-latest
+    concurrency: global-ssh
     needs: [update-network-policies]
     steps:
       - uses: actions/checkout@v6
@@ -24,6 +26,7 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   execute-deployment:
     runs-on: ubuntu-latest
+    concurrency: global-ssh
     needs: [update-network-policies, update-component-config]
     steps:
       - uses: actions/checkout@v6
@@ -34,6 +37,7 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   update-webservice:
     runs-on: ubuntu-latest
+    concurrency: global-ssh
     needs: [update-network-policies, update-component-config, execute-deployment]
     steps:
       - uses: actions/checkout@v6
@@ -44,6 +48,7 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   dologmsg-success:
     runs-on: ubuntu-latest
+    concurrency: global-ssh
     needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]
     steps:
       - uses: actions/checkout@v6
@@ -55,6 +60,7 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   dologmsg-failure:
     runs-on: ubuntu-latest
+    concurrency: global-ssh
     needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]
     if: ${{ failure() }}
     steps:

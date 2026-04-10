@@ -509,6 +509,7 @@ def _generate_workflow(tool_name: str):
     # Note: the config will not be re-fetched as `source_url` cannot be rewritten on the same sha... so this is '1 off'
     config += "  update-network-policies:\n"
     config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency: global-ssh\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v6\n"
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
@@ -519,6 +520,7 @@ def _generate_workflow(tool_name: str):
 
     config += "  update-component-config:\n"
     config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency: global-ssh\n"
     config += "    needs: [update-network-policies]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v6\n"
@@ -530,6 +532,7 @@ def _generate_workflow(tool_name: str):
 
     config += "  execute-deployment:\n"
     config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency: global-ssh\n"
     config += "    needs: [update-network-policies, update-component-config]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v6\n"
@@ -541,6 +544,7 @@ def _generate_workflow(tool_name: str):
 
     config += "  update-webservice:\n"
     config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency: global-ssh\n"
     config += "    needs: [update-network-policies, update-component-config, execute-deployment]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v6\n"
@@ -552,6 +556,7 @@ def _generate_workflow(tool_name: str):
 
     config += "  dologmsg-success:\n"
     config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency: global-ssh\n"
     config += "    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v6\n"
@@ -566,6 +571,7 @@ def _generate_workflow(tool_name: str):
 
     config += "  dologmsg-failure:\n"
     config += "    runs-on: ubuntu-latest\n"
+    config += "    concurrency: global-ssh\n"
     config += "    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]\n"
     config += "    if: ${{ failure() }}\n"
     config += "    steps:\n"
