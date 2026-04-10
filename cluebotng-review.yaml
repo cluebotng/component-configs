@@ -10,7 +10,7 @@ components:
       port: 8000
       replicas: 2
       memory: 2Gi
-      #health_check_http: /internal/health/
+      health_check_http: /internal/health/
   celery-worker:
     build:
       reuse_from: cluebotng-reviewer
@@ -37,14 +37,14 @@ components:
     run:
       command: run-server
       port: 9334
-      #health_check_http: /health
+      health_check_http: /health
   celery-flower:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: run-flower
       port: 5555
-      #health_check_http: /healthcheck
+      health_check_http: /healthcheck
       replicas: 2
   grafana-alloy:
     build:
@@ -54,7 +54,7 @@ components:
     run:
       command: run-alloy
       port: 8118
-      #health_check_http: /health
+      health_check_http: /health
       mount: all
   pushgateway:
     build:
@@ -64,7 +64,7 @@ components:
     run:
       command: run-pushgateway
       port: 9091
-      #health_check_http: /-/healthy
+      health_check_http: /-/healthy
       mount: all
   core:
     build:

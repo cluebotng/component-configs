@@ -11,7 +11,7 @@ components:
     run:
       command: botng --irc-relay --debug
       port: 8118
-      #health_check_http: /health
+      health_check_http: /health
   core:
     build:
       repository: https://github.com/cluebotng/external-core.git
@@ -29,7 +29,7 @@ components:
     run:
       command: web
       port: 8000
-      #health_check_http: /api/?action=health.check
+      health_check_http: /api/?action=health.check
       replicas: 2
   grafana-alloy:
     build:
@@ -39,7 +39,7 @@ components:
     run:
       command: run-alloy
       port: 8118
-      #health_check_http: /health
+      health_check_http: /health
       mount: all
   redis:
     build:

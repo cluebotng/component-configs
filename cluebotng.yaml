@@ -37,7 +37,7 @@ components:
     run:
       command: run-server
       port: 9334
-      #health_check_http: /health
+      health_check_http: /health
   # Report interface
   report-interface:
     build:
@@ -47,7 +47,7 @@ components:
     run:
       command: web
       port: 8000
-      #health_check_http: /api/?action=health.check
+      health_check_http: /api/?action=health.check
       replicas: 2
   report-review-import:
     build:
@@ -70,7 +70,7 @@ components:
     run:
       command: run-alloy
       port: 8118
-      #health_check_http: /health
+      health_check_http: /health
       mount: all
   pushgateway:
     build:
@@ -80,7 +80,7 @@ components:
     run:
       command: run-pushgateway
       port: 9091
-      #health_check_http: /-/healthy
+      health_check_http: /-/healthy
       mount: all
   ## Backups
   backup-database:
