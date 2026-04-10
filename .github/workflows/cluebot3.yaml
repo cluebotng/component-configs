@@ -1,5 +1,5 @@
 name: 'cluebot3'
-on: { push: { branches: [ main ], paths: [ 'cluebot3.yaml', 'config/general.yaml', 'config/network-policies/cluebot3.yaml', 'config/web-services/cluebot3.yaml', '.github/workflows/cluebot3.yaml' ] }, workflow_dispatch: { } }
+on: { push: { branches: [ main ], paths: [ 'cluebot3.yaml', 'config/general.yaml', 'config/network-policies/cluebot3.yaml', 'config/web-services/cluebot3.yaml', ] }, workflow_dispatch: { } }
 concurrency:
   group: cluebot3
 jobs:

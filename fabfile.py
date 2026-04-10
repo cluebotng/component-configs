@@ -501,7 +501,6 @@ def _generate_workflow(tool_name: str):
     config += "'config/general.yaml', "
     config += f"'config/network-policies/{tool_name}.yaml', "
     config += f"'config/web-services/{tool_name}.yaml', "
-    config += f"'.github/workflows/{tool_name}.yaml' "
     config += "] }, workflow_dispatch: { } }\n"
     config += f"concurrency:\n  group: {tool_name}\n"
     config += "jobs:\n"
