@@ -21,7 +21,7 @@ components:
   blackbox-exporter:
     build:
       repository: https://github.com/cluebotng/monitoring-blackbox-exporter.git
-      ref: refs/tags/v1.0.9
+      ref: refs/tags/v1.0.10
     run:
       command: blackbox-exporter
       port: 9115
