@@ -10,7 +10,7 @@ components:
   file-api:
     build:
       repository: https://github.com/cluebotng/fileserver.git
-      ref: refs/tags/v1.2.10
+      ref: refs/tags/v1.2.11
     run:
       command: run-fileserver
       port: 8000
