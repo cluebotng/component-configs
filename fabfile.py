@@ -19,61 +19,6 @@ EMIT_LOG_MESSAGES = os.environ.get("EMIT_LOG_MESSAGES", "true") == "true"
 
 
 @dataclasses.dataclass
-class WebServiceIngressConfig:
-    tool_name: str
-    target_component: str
-    target_port: int
-
-    def __str__(self) -> str:
-        return f"Ingress(backend={self.target_component}, port={self.target_port})"
-
-    @staticmethod
-    def from_values(tool_name: str, data: Dict[str, Any]) -> "WebServiceIngressConfig":
-        return WebServiceIngressConfig(
-            tool_name=tool_name,
-            target_component=data.get("component"),
-            target_port=data.get("port"),
-        )
-
-    def as_k8s_object(self) -> Dict[str, Any]:
-        return {
-            "apiVersion": "networking.k8s.io/v1",
-            "kind": "Ingress",
-            "metadata": {
-                "name": f"{self.tool_name}-subdomain",
-                "labels": {
-                    "app.kubernetes.io/component": "web",
-                    "app.kubernetes.io/managed-by": "component-configs",
-                    "toolforge": "tool",
-                    "name": self.tool_name,
-                },
-            },
-            "spec": {
-                "ingressClassName": "toolforge",
-                "rules": [
-                    {
-                        "host": f"{self.tool_name}.toolforge.org",
-                        "http": {
-                            "paths": [
-                                {
-                                    "path": "/",
-                                    "pathType": "Prefix",
-                                    "backend": {
-                                        "service": {
-                                            "name": self.target_component,
-                                            "port": {"number": self.target_port},
-                                        }
-                                    },
-                                }
-                            ]
-                        },
-                    }
-                ],
-            },
-        }
-
-
-@dataclasses.dataclass
 class WebServiceHttpRouteConfig:
     tool_name: str
     target_component: str
@@ -275,9 +220,7 @@ def _get_target_tools() -> List[str]:
     ]
 
 
-def _get_web_services() -> (
-    Dict[str, List[WebServiceHttpRouteConfig | WebServiceIngressConfig]]
-):
+def _get_web_services() -> Dict[str, List[WebServiceHttpRouteConfig]]:
     config = {}
     config_path = PosixPath(__file__).parent / "config" / "web-services"
     if config_path.is_dir():
@@ -293,7 +236,6 @@ def _get_web_services() -> (
 
     return {
         tool_name: [
-            WebServiceIngressConfig.from_values(tool_name, config),
             WebServiceHttpRouteConfig.from_values(tool_name, config),
         ]
         for tool_name, config in config.items()
@@ -393,7 +335,7 @@ def _delete_kubernetes_object(c: Connection, obj_type: str, obj_name: str) -> bo
 def _ensure_kubernetes_object(
     c: Connection,
     tool_name: str,
-    obj: WebServiceHttpRouteConfig | WebServiceIngressConfig | NetworkPolicy,
+    obj: WebServiceHttpRouteConfig | NetworkPolicy,
 ) -> bool:
     if hasattr(obj, "delete") and obj.delete:
         return _delete_kubernetes_object(c, obj.k8s_type, obj.name)
