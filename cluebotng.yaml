@@ -12,12 +12,12 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: refs/tags/v2.0.5
+      ref: refs/tags/v2.0.6
     run:
-      command: run-cbng
+      command: cbng
       memory: 2Gi
       cpu: '3'
-      health_check_script: health-check
+      health_check_script: health
   # Supporting services
   redis:
     build:
