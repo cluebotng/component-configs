@@ -48,7 +48,7 @@ components:
   checker:
     build:
       repository: https://github.com/cluebotng/monitoring-checker.git
-      ref: refs/tags/v1.3.5
+      ref: refs/tags/v1.3.6
     run:
       command: run-checker
       port: 8090
