@@ -2,7 +2,7 @@ components:
   coordinator:
     build:
       repository: https://github.com/cluebotng/trainer.git
-      ref: refs/tags/v1.5.10
+      ref: refs/tags/v1.5.11
     run:
       schedule: '13 13 * * *'
       mount: all
