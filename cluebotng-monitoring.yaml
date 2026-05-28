@@ -29,7 +29,7 @@ components:
   grafana:
     build:
       repository: https://github.com/cluebotng/monitoring-grafana.git
-      ref: refs/tags/v1.0.68
+      ref: refs/tags/v1.0.69
     run:
       command: grafana
       port: 3000
