@@ -3,7 +3,7 @@ components:
   core:
     build:
       repository: https://github.com/cluebotng/external-core.git
-      ref: refs/tags/v0.0.14
+      ref: refs/tags/v0.0.15
     run:
       command: ./cluebotng -l -m live_run
       port: 3565
