@@ -3,14 +3,6 @@ source:
   branch: main
   path: cluebotng-staging.yaml
 components:
-  bot:
-    build:
-      repository: https://github.com/cluebotng/botng.git
-      ref: refs/tags/v0.0.50
-    run:
-      command: botng --irc-relay --debug
-      port: 8118
-      health_check_http: /health
   core:
     build:
       repository: https://github.com/cluebotng/external-core.git
