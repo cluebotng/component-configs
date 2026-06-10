@@ -3,11 +3,6 @@
   allow:
     - namespace: tool-cluebotng-monitoring
 
-- name: restrict-pushgateway
-  match: pushgateway
-  allow:
-    - namespace: tool-cluebotng-trainer
-
 - name: restrict-monitoring-toolforge
   match: monitoring-toolforge
   allow:

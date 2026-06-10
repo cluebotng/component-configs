@@ -24,9 +24,7 @@
   allow:
     - namespace: tool-cluebotng-staging
 
-# Cleanup
-- name: limit-access-bot
-  delete: True
-
-- name: limit-access-core
-  delete: True
+- name: restrict-monitoring-toolforge
+  match: monitoring-toolforge
+  allow:
+    - pod: grafana-alloy

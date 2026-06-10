@@ -37,6 +37,15 @@ components:
       port: 8118
       health_check_http: /health
       mount: all
+  monitoring-toolforge:
+    build:
+      repository: https://github.com/cluebotng/monitoring-toolforge.git
+      ref: refs/tags/v1.0.0
+    run:
+      command: run
+      port: 8000
+      health_check_http: /health
+      mount: all
   redis:
     build:
       repository: https://github.com/cluebotng/external-redis.git

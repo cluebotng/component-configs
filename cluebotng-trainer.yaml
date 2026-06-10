@@ -36,6 +36,15 @@ components:
       port: 9091
       health_check_http: /-/healthy
       mount: all
+  monitoring-toolforge:
+    build:
+      repository: https://github.com/cluebotng/monitoring-toolforge.git
+      ref: refs/tags/v1.0.0
+    run:
+      command: run
+      port: 8000
+      health_check_http: /health
+      mount: all
   ## Cleanup
   prune-runs:
     build:

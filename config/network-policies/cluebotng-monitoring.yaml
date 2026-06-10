@@ -4,11 +4,16 @@
   allow:
     # Internal access
     - pod: grafana
+    - pod: grafana-alloy
 
     # Namespaces which use remote write
+    - namespace: tool-cluebot-syncer
+    - namespace: tool-cluebot3
     - namespace: tool-cluebotng
+    - namespace: tool-cluebotng-editsets
     - namespace: tool-cluebotng-review
     - namespace: tool-cluebotng-staging
+    - namespace: tool-cluebotng-trainer
     - namespace: tool-toolforge-functional-runner
 
 - name: restrict-alertmanager
@@ -43,9 +48,7 @@
   allow:
     - namespace: tool-cluebotng-monitoring
 
-# Cleanup
-- name: restrict-alertmanager-access
-  delete: True
-
-- name: restrict-prometheus-access
-  delete: True
+- name: restrict-monitoring-toolforge
+  match: monitoring-toolforge
+  allow:
+    - pod: grafana-alloy

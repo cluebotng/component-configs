@@ -25,9 +25,7 @@
   allow:
     - namespace: tool-cluebotng
 
-# Cleanup
-- name: limit-access-irc-relay
-  delete: True
-
-- name: limit-access-core
-  delete: True
+- name: restrict-monitoring-toolforge
+  match: monitoring-toolforge
+  allow:
+    - pod: grafana-alloy
