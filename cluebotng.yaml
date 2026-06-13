@@ -9,6 +9,7 @@ components:
       port: 3565
       memory: 1Gi
       cpu: '1'
+      health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
