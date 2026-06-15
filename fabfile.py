@@ -419,9 +419,7 @@ def _execute_checked_deployment(
     deploy_id, deploy_success = _execute_deployment(
         tool_name, deploy_token, force_run, force_build
     )
-    if deploy_success or not _has_deployment_hit_build_limit(
-        c, tool_name, deploy_id
-    ):
+    if deploy_success or not _has_deployment_hit_build_limit(c, tool_name, deploy_id):
         return deploy_id, deploy_success
 
     if attempt > MAX_DEPLOYMENT_ATTEMPTS:
@@ -456,7 +454,9 @@ def _execute_deployment(
             time.sleep(1)
             continue
 
-        print("Deployment is not pending, running or successful; probably failed")
+        print(
+            f"Deployment is not pending, running or successful; probably failed ({deployment_status})"
+        )
         return deploy_id, False
 
 
@@ -700,12 +700,84 @@ def update_static_files(_ctx):
 
 
 @task()
+def purge_tool_account(_ctx):
+    """Remove all configuration from a tool account."""
+    if not TARGET_USER:
+        print("Will only purge tool accounts for a single tool")
+        sys.exit(1)
+
+    c = _get_connection_for_tool(TARGET_USER)
+
+    # Remove jobs
+    print(f"Flushing jobs for {TARGET_USER}")
+    c.sudo(f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' toolforge jobs flush")
+
+    # Remove builds from builds-api
+    print(f"Removing builds for {TARGET_USER}")
+    raw_build_output = c.sudo(
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' toolforge build list --json",
+        hide="stdout",
+    ).stdout.strip()
+
+    # Bug: T429229
+    for build in json.loads(
+        "{}" if "No builds found" in raw_build_output else raw_build_output
+    ).get("builds", []):
+        c.sudo(
+            f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' "
+            f"toolforge build delete -y {build['build_id']}",
+            hide="stdout",
+        )
+
+    # Remove images from harbor
+    c.sudo(
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' toolforge build clean -y",
+        hide="stdout",
+    )
+
+    # Remove deployments
+    print(f"Removing deployments for {TARGET_USER}")
+    raw_deployment_list_output = c.sudo(
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' "
+        f"toolforge components deployment list --json",
+        hide="stdout",
+        warn=True,
+    )
+    raw_deployment_output = raw_deployment_list_output.stdout or "{}"
+    if (
+        raw_deployment_list_output.exited != 0
+        and f"No deployments found for tool: {TARGET_USER}"
+        not in raw_deployment_list_output.stderr
+    ):
+        raise RuntimeError(
+            f"deployment list failed with {raw_deployment_list_output.exited}\n"
+            f"Stdout:\n{raw_deployment_list_output.stdout}\n"
+            f"Stderr: \n{raw_deployment_list_output.stderr}\n"
+        )
+
+    for deployment in (
+        json.loads(raw_deployment_output).get("data", {}).get("deployments", [])
+    ):
+        c.sudo(
+            f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' "
+            f"toolforge components deployment delete --yes-im-sure {deployment['deploy_id']}",
+            hide="stdout",
+        )
+
+
+@task()
 def deploy(ctx):
     update_network_policies(ctx)
     update_component_config(ctx)
     execute_deployment(ctx)
     update_webservice(ctx)
     update_static_files(ctx)
+
+
+@task()
+def clean_deploy(ctx):
+    purge_tool_account(ctx)
+    deploy(ctx)
 
 
 @task()
