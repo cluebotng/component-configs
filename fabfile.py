@@ -454,9 +454,7 @@ def _execute_deployment(
             time.sleep(1)
             continue
 
-        print(
-            f"Deployment is not pending, running or successful; probably failed ({deployment_status})"
-        )
+        print(f"Deployment is not pending, running or successful: {deployment_status}")
         return deploy_id, False
 
 
@@ -468,11 +466,16 @@ def _wait_for_pending_builds(c: Connection, tool_name: str) -> None:
         ).stdout.strip()
     )
 
-    for build in builds_output.get("builds", []):
-        if build["status"] == "pending":
-            print(f"Found pending build '{build['build_id']}' for {tool_name}")
-            time.sleep(1)
-            return _wait_for_pending_builds(c, tool_name)
+    if pending_builds := [
+        build
+        for build in builds_output.get("builds", [])
+        if build["status"] in ("pending", "running")
+    ]:
+        print(f"Found pending builds for {tool_name}:")
+        for build in pending_builds:
+            print(f'  {build["build_id"]} ({build["source_url"]}): {build["status"]}')
+        time.sleep(5)
+        return _wait_for_pending_builds(c, tool_name)
 
     print(f"Found no pending builds for {tool_name}")
     return None
