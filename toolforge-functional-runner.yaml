@@ -6,7 +6,6 @@ components:
     run:
       command: run
       port: 9091
-      replicas: 1
       health_check_http: /
   grafana-alloy:
     build:

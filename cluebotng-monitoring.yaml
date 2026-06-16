@@ -34,7 +34,6 @@ components:
       command: grafana
       port: 3000
       health_check_http: /api/health
-      replicas: 1
       mount: all
   wiki-update-receiver:
     build:
