@@ -49,7 +49,7 @@ components:
   prune-runs:
     build:
       repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v1.4.1
+      ref: refs/tags/v1.4.2
     run:
       command: bash -c 'find "/data/project/cluebotng-trainer/public_html" -type f -mtime +7 -delete'
       schedule: '30 2 * * *'
