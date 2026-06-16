@@ -166,14 +166,14 @@ components:
   backup-database:
     build:
       repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v1.3.1
+      ref: refs/tags/v1.4.0
     run:
       command: scripts/database-to-object-store.py
       schedule: '45 */4 * * *'
   backup-database-daily:
     build:
       repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v1.3.1
+      ref: refs/tags/v1.4.0
     run:
       command: scripts/database-to-nfs.py
       schedule: '13 1 * * *'
