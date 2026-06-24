@@ -30,7 +30,7 @@ components:
   irc-relay:
     build:
       repository: https://github.com/cluebotng/irc-relay.git
-      ref: refs/tags/v2.0.81
+      ref: refs/tags/v3.0.0
     run:
       command: run-server
       port: 9334
