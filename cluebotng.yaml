@@ -13,7 +13,7 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: feature/refactor-irc-feed
+      ref: feature/refactor-relay
     run:
       command: run-cbng
       memory: 2Gi
@@ -30,7 +30,7 @@ components:
   irc-relay:
     build:
       repository: https://github.com/cluebotng/irc-relay.git
-      ref: refs/tags/v2.0.81
+      ref: feature/handle-structured-messages
     run:
       command: run-server
       port: 9334
