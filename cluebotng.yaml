@@ -13,7 +13,7 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: feature/add-http-feed
+      ref: refs/tags/v3.0.0
     run:
       command: run-cbng
       memory: 2Gi
