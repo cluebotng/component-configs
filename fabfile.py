@@ -13,7 +13,6 @@ import requests
 from requests.exceptions import HTTPError
 from fabric import Connection, Config, task
 
-
 TARGET_USER = os.environ.get("TARGET_USER")
 TOOL_BASE_DIR = PosixPath("/data/project")
 EMIT_LOG_MESSAGES = os.environ.get("EMIT_LOG_MESSAGES", "true") == "true"
@@ -30,9 +29,7 @@ class WebServiceHttpRouteConfig:
         return f"HttpRoute(backend={self.target_component}, port={self.target_port})"
 
     @staticmethod
-    def from_values(
-        tool_name: str, data: Dict[str, Any]
-    ) -> "WebServiceHttpRouteConfig":
+    def from_values(tool_name: str, data: Dict[str, Any]) -> "WebServiceHttpRouteConfig":
         return WebServiceHttpRouteConfig(
             tool_name=tool_name,
             target_component=data.get("component"),
@@ -55,13 +52,7 @@ class WebServiceHttpRouteConfig:
             "spec": {
                 "parentRefs": [{"namespace": "istio-gateway", "name": "toolforge"}],
                 "hostnames": [f"{self.tool_name}.toolforge.org"],
-                "rules": [
-                    {
-                        "backendRefs": [
-                            {"name": self.target_component, "port": self.target_port}
-                        ]
-                    }
-                ],
+                "rules": [{"backendRefs": [{"name": self.target_component, "port": self.target_port}]}],
             },
         }
 
@@ -148,13 +139,7 @@ class StaticFile:
     mode: str
 
     def load(self) -> str:
-        path = (
-            PosixPath(__file__).parent
-            / "config"
-            / "static-files"
-            / "files"
-            / self.source
-        )
+        path = PosixPath(__file__).parent / "config" / "static-files" / "files" / self.source
         with path.open("r") as fh:
             return fh.read()
 
@@ -177,49 +162,21 @@ def _raise_for_status_with_no_url(response: requests.Response) -> None:
         reason = response.reason
 
     if 400 <= response.status_code < 500:
-        raise HTTPError(
-            f"{response.status_code} Client Error: {reason}", response=response
-        )
+        raise HTTPError(f"{response.status_code} Client Error: {reason}", response=response)
 
     elif 500 <= response.status_code < 600:
-        raise HTTPError(
-            f"{response.status_code} Server Error: {reason}", response=response
-        )
-
-
-def _get_head_ref() -> Optional[str]:
-    r = requests.get(
-        "https://api.github.com/repos/cluebotng/component-configs/git/refs"
-    )
-    r.raise_for_status()
-    for branch in r.json():
-        if branch["ref"] == "refs/heads/main":
-            return branch["object"]["sha"]
-    return None
+        raise HTTPError(f"{response.status_code} Server Error: {reason}", response=response)
 
 
 def _get_connection_for_tool(tool_name: str) -> Connection:
     return Connection(
         "login.toolforge.org",
-        config=Config(
-            overrides={
-                "sudo": {"user": f"tools.{tool_name}", "prefix": "/usr/bin/sudo -ni"}
-            }
-        ),
+        config=Config(overrides={"sudo": {"user": f"tools.{tool_name}", "prefix": "/usr/bin/sudo -ni"}}),
     )
 
 
-def _get_config_url(config_url: str, latest_sha: Optional[str]):
-    if not latest_sha:
-        latest_sha = "refs/heads/main"
-    return f"https://raw.githubusercontent.com/cluebotng/component-configs/{latest_sha}/{config_url}.yaml"
-
-
 def _get_target_tools() -> List[str]:
-    return [
-        config.name.split(".yaml")[0]
-        for config in PosixPath(__file__).parent.glob("*.yaml")
-    ]
+    return [config.name.split(".yaml")[0] for config in PosixPath(__file__).parent.glob("*.yaml")]
 
 
 def _get_web_services() -> Dict[str, List[WebServiceHttpRouteConfig]]:
@@ -228,13 +185,7 @@ def _get_web_services() -> Dict[str, List[WebServiceHttpRouteConfig]]:
     if config_path.is_dir():
         for path in config_path.glob("*.yaml"):
             with path.open("r") as fh:
-                config.update(
-                    {
-                        path.name.split(".yaml")[0]: yaml.load(
-                            fh.read(), Loader=yaml.SafeLoader
-                        )
-                    }
-                )
+                config.update({path.name.split(".yaml")[0]: yaml.load(fh.read(), Loader=yaml.SafeLoader)})
 
     return {
         tool_name: [
@@ -250,17 +201,10 @@ def _get_network_policies() -> Dict[str, List[NetworkPolicy]]:
     if config_path.is_dir():
         for path in config_path.glob("*.yaml"):
             with path.open("r") as fh:
-                config.update(
-                    {
-                        path.name.split(".yaml")[0]: yaml.load(
-                            fh.read(), Loader=yaml.SafeLoader
-                        )
-                    }
-                )
+                config.update({path.name.split(".yaml")[0]: yaml.load(fh.read(), Loader=yaml.SafeLoader)})
 
     return {
-        tool_name: [NetworkPolicy.from_values(config) for config in entries]
-        for tool_name, entries in config.items()
+        tool_name: [NetworkPolicy.from_values(config) for config in entries] for tool_name, entries in config.items()
     }
 
 
@@ -270,18 +214,9 @@ def _get_static_files() -> Dict[str, List[StaticFile]]:
     if config_path.is_dir():
         for path in config_path.glob("*.yaml"):
             with path.open("r") as fh:
-                config.update(
-                    {
-                        path.name.split(".yaml")[0]: yaml.load(
-                            fh.read(), Loader=yaml.SafeLoader
-                        )
-                    }
-                )
+                config.update({path.name.split(".yaml")[0]: yaml.load(fh.read(), Loader=yaml.SafeLoader)})
 
-    return {
-        tool_name: [StaticFile.from_values(config) for config in entries]
-        for tool_name, entries in config.items()
-    }
+    return {tool_name: [StaticFile.from_values(config) for config in entries] for tool_name, entries in config.items()}
 
 
 def _setup_component_configs(c: Connection, tool_name: str):
@@ -316,9 +251,7 @@ def _get_deployment_token(c: Connection, tool_name: str):
 def _apply_kubernetes_object(c: Connection, k8s_obj: Dict[str, Any]) -> bool:
     obj_as_yaml = yaml.dump(k8s_obj)
     encoded_contents = base64.b64encode(obj_as_yaml.encode("utf-8")).decode("utf-8")
-    ret = c.sudo(
-        f'bash -c "base64 -d <<<{encoded_contents} | kubectl apply -f-"', hide="both"
-    )
+    ret = c.sudo(f'bash -c "base64 -d <<<{encoded_contents} | kubectl apply -f-"', hide="both")
     if ret.exited != 0:
         print(f"kubectl apply failed: {ret.stdout} / {ret.stderr}")
     return ret.exited == 0
@@ -352,9 +285,7 @@ def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) 
     encoded_contents = base64.b64encode(contents.encode("utf-8")).decode("utf-8")
     target_path = TOOL_BASE_DIR / tool_name / static_file.target
 
-    print(
-        f"Writing {static_file.source} to {target_path.absolute()} ({static_file.mode})"
-    )
+    print(f"Writing {static_file.source} to {target_path.absolute()} ({static_file.mode})")
     ret = c.sudo(
         f'bash -c "'
         f"mkdir -p '{target_path.parent}' &&"
@@ -373,14 +304,10 @@ def _dologmsg(tool_name: str, message: str):
 
     if EMIT_LOG_MESSAGES:
         feed_message = f"#wikimedia-cloud-feed !log tools.{tool_name} {message}"
-        c.run(
-            f"echo '{feed_message}' > /dev/tcp/wm-bot.wm-bot.wmcloud.org/64835 || true"
-        )
+        c.run(f"echo '{feed_message}' > /dev/tcp/wm-bot.wm-bot.wmcloud.org/64835 || true")
 
 
-def _start_deployment(
-    tool_name: str, deploy_token: str, force_run: bool, force_build: bool
-) -> Optional[str]:
+def _start_deployment(tool_name: str, deploy_token: str, force_run: bool, force_build: bool) -> Optional[str]:
     r = requests.post(
         f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment",
         params={
@@ -390,9 +317,7 @@ def _start_deployment(
         },
     )
     if r.status_code == 409:
-        print(
-            f"Deployment already in progress for {tool_name} - multiple/queueing not supported currently!"
-        )
+        print(f"Deployment already in progress for {tool_name} - multiple/queueing not supported currently!")
         return None
 
     _raise_for_status_with_no_url(r)
@@ -416,9 +341,7 @@ def _execute_checked_deployment(
     force_build: bool,
     attempt: int,
 ) -> tuple[str | None, bool]:
-    deploy_id, deploy_success = _execute_deployment(
-        tool_name, deploy_token, force_run, force_build
-    )
+    deploy_id, deploy_success = _execute_deployment(tool_name, deploy_token, force_run, force_build)
     if deploy_success or not _has_deployment_hit_build_limit(c, tool_name, deploy_id):
         return deploy_id, deploy_success
 
@@ -430,9 +353,7 @@ def _execute_checked_deployment(
     _wait_for_pending_builds(c, tool_name)
 
     print(f"Re-attempting deployment ({attempt})")
-    return _execute_checked_deployment(
-        c, tool_name, deploy_token, force_run, force_build, attempt + 1
-    )
+    return _execute_checked_deployment(c, tool_name, deploy_token, force_run, force_build, attempt + 1)
 
 
 def _execute_deployment(
@@ -467,9 +388,7 @@ def _wait_for_pending_builds(c: Connection, tool_name: str) -> None:
     )
 
     if pending_builds := [
-        build
-        for build in builds_output.get("builds", [])
-        if build["status"] in ("pending", "running")
+        build for build in builds_output.get("builds", []) if build["status"] in ("pending", "running")
     ]:
         print(f"Found pending builds for {tool_name}:")
         for build in pending_builds:
@@ -481,9 +400,7 @@ def _wait_for_pending_builds(c: Connection, tool_name: str) -> None:
     return None
 
 
-def _has_deployment_hit_build_limit(
-    c: Connection, tool_name: str, deploy_id: str
-) -> bool:
+def _has_deployment_hit_build_limit(c: Connection, tool_name: str, deploy_id: str) -> bool:
     deployment_output = json.loads(
         c.sudo(
             f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components deployment show --json '{deploy_id}'",
@@ -609,9 +526,7 @@ def rotate_deployment_token(_ctx):
 def create_workflows(_ctx):
     """Generate Github workflows for each tool"""
     for tool_name in _get_target_tools():
-        workflow_file = (
-            PosixPath(__file__).parent / ".github" / "workflows" / f"{tool_name}.yaml"
-        )
+        workflow_file = PosixPath(__file__).parent / ".github" / "workflows" / f"{tool_name}.yaml"
         with workflow_file.open("w") as fh:
             fh.write(_generate_workflow(tool_name))
 
@@ -673,9 +588,7 @@ def update_network_policies(_ctx):
             if tool_network_policies := network_policies.get(tool_name):
                 is_success = True
                 for network_policy in tool_network_policies:
-                    is_success &= _ensure_kubernetes_object(
-                        c, tool_name, network_policy
-                    )
+                    is_success &= _ensure_kubernetes_object(c, tool_name, network_policy)
                 if not is_success:
                     print(f"Deployment failed for {tool_name}")
                     if TARGET_USER:
@@ -723,12 +636,9 @@ def purge_tool_account(_ctx):
     ).stdout.strip()
 
     # Bug: T429229
-    for build in json.loads(
-        "{}" if "No builds found" in raw_build_output else raw_build_output
-    ).get("builds", []):
+    for build in json.loads("{}" if "No builds found" in raw_build_output else raw_build_output).get("builds", []):
         c.sudo(
-            f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' "
-            f"toolforge build delete -y {build['build_id']}",
+            f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' toolforge build delete -y {build['build_id']}",
             hide="stdout",
         )
 
@@ -741,16 +651,14 @@ def purge_tool_account(_ctx):
     # Remove deployments
     print(f"Removing deployments for {TARGET_USER}")
     raw_deployment_list_output = c.sudo(
-        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' "
-        f"toolforge components deployment list --json",
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' toolforge components deployment list --json",
         hide="stdout",
         warn=True,
     )
     raw_deployment_output = raw_deployment_list_output.stdout or "{}"
     if (
         raw_deployment_list_output.exited != 0
-        and f"No deployments found for tool: {TARGET_USER}"
-        not in raw_deployment_list_output.stderr
+        and f"No deployments found for tool: {TARGET_USER}" not in raw_deployment_list_output.stderr
     ):
         raise RuntimeError(
             f"deployment list failed with {raw_deployment_list_output.exited}\n"
@@ -758,9 +666,7 @@ def purge_tool_account(_ctx):
             f"Stderr: \n{raw_deployment_list_output.stderr}\n"
         )
 
-    for deployment in (
-        json.loads(raw_deployment_output).get("data", {}).get("deployments", [])
-    ):
+    for deployment in json.loads(raw_deployment_output).get("data", {}).get("deployments", []):
         c.sudo(
             f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' "
             f"toolforge components deployment delete --yes-im-sure {deployment['deploy_id']}",
