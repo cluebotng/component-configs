@@ -51,12 +51,14 @@ components:
     run:
       command: curl -s https://cluebotng.toolforge.org/api/?action=review.import
       schedule: '13 * * * *'
+      timeout: 3600
   report-send-whitelisted-to-review:
     build:
       reuse_from: report-interface
     run:
       command: php -f scripts/send_whitelisted_users_to_review.php
       schedule: '13 2 * * *'
+      timeout: 3600
   # Monitoring
   grafana-alloy:
     build:
@@ -93,6 +95,7 @@ components:
     run:
       command: bash -c 'mkdir -p /data/project/cluebotng/mysql_backups/ && mysqldump --defaults-file=/data/project/cluebotng/replica.my.cnf -h tools-db s52585__cb | gzip -9 > /data/project/cluebotng/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
       schedule: '45 */2 * * *'
+      timeout: 10800
       mount: all
   prune-backups:
     build:
@@ -100,4 +103,5 @@ components:
     run:
       command: bash -c 'find "/data/project/cluebotng/mysql_backups" -mtime +7 -delete'
       schedule: '30 5 * * *'
+      timeout: 3600
       mount: all

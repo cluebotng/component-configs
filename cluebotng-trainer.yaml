@@ -5,6 +5,7 @@ components:
       ref: refs/tags/v2.0.0
     run:
       schedule: '13 13 * * *'
+      timeout: 3600
       mount: all
       command: launcher ./deployment/entrypoint.sh run-edit-sets
   file-api:
@@ -53,4 +54,5 @@ components:
     run:
       command: bash -c 'find "/data/project/cluebotng-trainer/public_html" -type f -mtime +7 -delete'
       schedule: '30 2 * * *'
+      timeout: 3600
       mount: all

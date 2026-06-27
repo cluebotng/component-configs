@@ -5,6 +5,7 @@ components:
       ref: refs/tags/v1.1.14
     run:
       schedule: '*/15 * * * *'
+      timeout: 3600
       mount: none
       command: run-sync
   # Monitoring

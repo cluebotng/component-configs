@@ -86,12 +86,14 @@ components:
     run:
       command: ./manage.py export_statistics
       schedule: 13 9 * * *
+      timeout: 3600
   update-edit-classifications:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py update_edit_classification
       schedule: 30 */2 * * *
+      timeout: 3600
   ## Seed jobs
   add-reported-edits:
     build:
@@ -99,12 +101,14 @@ components:
     run:
       command: ./manage.py add_reported_edits
       schedule: 55 * * * *
+      timeout: 3600
   add-edits-to-queue:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py add_edits_to_queue
       schedule: 13 6 * * *
+      timeout: 3600
   ## Helper jobs
   add-reviews-from-report:
     build:
@@ -112,12 +116,14 @@ components:
     run:
       command: ./manage.py add_reviews_from_report
       schedule: 15 * * * *
+      timeout: 3600
   add-reviews-from-huggle:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py add_reviews_from_huggle
       schedule: 23 */2 * * *
+      timeout: 3600
   ## Back-fill jobs
   import-training-data:
     build:
@@ -125,24 +131,28 @@ components:
     run:
       command: ./manage.py import_training_data
       schedule: 15 2 * * *
+      timeout: 3600
   mark-edits-as-deleted:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py mark_edits_as_deleted
       schedule: 13 4 * * *
+      timeout: 3600
   mark-edits-as-having-data:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py mark_edits_with_training_data
       schedule: 13 3 * * *
+      timeout: 3600
   add-dangling-edits-to-group:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py add_dangling_edits_to_group
       schedule: 13 21 * * *
+      timeout: 3600
   ## Management jobs
   cleanup-user-records:
     build:
@@ -150,18 +160,21 @@ components:
     run:
       command: ./manage.py cleanup_user_records
       schedule: 13 1 * * *
+      timeout: 3600
   update-user-usernames:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py update_usernames
       schedule: 13 2 * * *
+      timeout: 3600
   auto-grant-reviewer-access:
     build:
       reuse_from: cluebotng-reviewer
     run:
       command: ./manage.py auto_grant_reviewer_access
       schedule: 27 * * * *
+      timeout: 3600
   ## Backups
   backup-database:
     build:
@@ -170,6 +183,7 @@ components:
     run:
       command: scripts/database-to-object-store.py
       schedule: '45 */4 * * *'
+      timeout: 10800
   backup-database-daily:
     build:
       repository: https://github.com/cluebotng/external-utilities.git
@@ -177,6 +191,7 @@ components:
     run:
       command: scripts/database-to-nfs.py
       schedule: '13 1 * * *'
+      timeout: 10800
       mount: all
   prune-backups:
     build:
@@ -184,4 +199,5 @@ components:
     run:
       command: bash -c 'find "/data/project/cluebotng-review/mysql_backups" -mtime +7 -delete'
       schedule: '30 5 * * *'
+      timeout: 3600
       mount: all
