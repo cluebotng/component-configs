@@ -9,6 +9,11 @@
   allow:
     - pod: bot
 
+- name: restrict-bot
+  match: bot
+  allow:
+    - pod: grafana-alloy
+
 - name: restrict-redis
   match: redis
   allow:

@@ -13,9 +13,10 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: refs/tags/v3.1.0
+      ref: feature/add-prometheus-metrics
     run:
       command: run-cbng
+      port: 9095
       memory: 2Gi
       cpu: '1'
       health_check_script: health-check
