@@ -31,7 +31,7 @@ components:
   irc-relay:
     build:
       repository: https://github.com/cluebotng/irc-relay.git
-      ref: refs/tags/v3.0.0
+      ref: feature/add-warned-user-support
     run:
       command: run-server
       port: 9334
