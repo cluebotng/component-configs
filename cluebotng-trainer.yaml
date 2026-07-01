@@ -22,7 +22,7 @@ components:
   grafana-alloy:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
-      ref: refs/tags/v0.6.0
+      ref: refs/tags/v0.7.0
     run:
       command: run-alloy
       port: 8118
