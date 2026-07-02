@@ -64,7 +64,7 @@ components:
   monitoring-toolforge:
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
-      ref: refs/tags/v1.1.1
+      ref: refs/tags/v1.2.0
     run:
       command: run
       port: 8000
