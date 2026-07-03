@@ -13,7 +13,7 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: refs/tags/v4.3.0
+      ref: refs/tags/v4.40
     run:
       command: run-cbng
       port: 9095
