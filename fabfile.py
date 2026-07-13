@@ -16,7 +16,6 @@ from fabric import Connection, Config, task
 TARGET_USER = os.environ.get("TARGET_USER")
 TOOL_BASE_DIR = PosixPath("/data/project")
 EMIT_LOG_MESSAGES = os.environ.get("EMIT_LOG_MESSAGES", "true") == "true"
-MAX_DEPLOYMENT_ATTEMPTS = 3
 
 
 @dataclasses.dataclass
@@ -333,29 +332,6 @@ def _get_deployment_status(tool_name: str, deploy_id: str, deploy_token: str) ->
     return r.json()["data"].get("status", "unknown")
 
 
-def _execute_checked_deployment(
-    c: Connection,
-    tool_name: str,
-    deploy_token: str,
-    force_run: bool,
-    force_build: bool,
-    attempt: int,
-) -> tuple[str | None, bool]:
-    deploy_id, deploy_success = _execute_deployment(tool_name, deploy_token, force_run, force_build)
-    if deploy_success or not _has_deployment_hit_build_limit(c, tool_name, deploy_id):
-        return deploy_id, deploy_success
-
-    if attempt > MAX_DEPLOYMENT_ATTEMPTS:
-        print(f"Failed deployment {attempt} times, aborting")
-        return deploy_id, False
-
-    # We have hit a build limit... wait for the builds to finish, then do another deploy
-    _wait_for_pending_builds(c, tool_name)
-
-    print(f"Re-attempting deployment ({attempt})")
-    return _execute_checked_deployment(c, tool_name, deploy_token, force_run, force_build, attempt + 1)
-
-
 def _execute_deployment(
     tool_name: str, deploy_token: str, force_run: bool, force_build: bool
 ) -> tuple[str | None, bool]:
@@ -371,49 +347,11 @@ def _execute_deployment(
             return deploy_id, True
 
         if deployment_status in ["pending", "running"]:
-            print("Deployment is pending or in progress")
             time.sleep(1)
             continue
 
-        print(f"Deployment is not pending, running or successful: {deployment_status}")
-        return deploy_id, False
-
-
-def _wait_for_pending_builds(c: Connection, tool_name: str) -> None:
-    builds_output = json.loads(
-        c.sudo(
-            f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge build list --json",
-            hide="stdout",
-        ).stdout.strip()
-    )
-
-    if pending_builds := [
-        build for build in builds_output.get("builds", []) if build["status"] in ("pending", "running")
-    ]:
-        print(f"Found pending builds for {tool_name}:")
-        for build in pending_builds:
-            print(f'  {build["build_id"]} ({build["source_url"]}): {build["status"]}')
-        time.sleep(5)
-        return _wait_for_pending_builds(c, tool_name)
-
-    print(f"Found no pending builds for {tool_name}")
-    return None
-
-
-def _has_deployment_hit_build_limit(c: Connection, tool_name: str, deploy_id: str) -> bool:
-    deployment_output = json.loads(
-        c.sudo(
-            f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components deployment show --json '{deploy_id}'",
-            hide="stdout",
-        ).stdout.strip()
-    )
-
-    for build in deployment_output.get("builds", {}).values():
-        if build.get("build_status") == "failed":
-            if "Got too many builds running" in build.get("build_long_status"):
-                return True
-
-    return False
+    print(f"Deployment is not pending, running or successful: {deployment_status}")
+    return deploy_id, False
 
 
 def _show_deployment(c: Connection, tool_name: str, deploy_token: str) -> None:
@@ -551,9 +489,7 @@ def execute_deployment(_ctx, force_run: bool = False, force_build: bool = False)
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
             if deploy_token := _get_deployment_token(c, tool_name):
-                deploy_id, deploy_success = _execute_checked_deployment(
-                    c, tool_name, deploy_token, force_run, force_build, 1
-                )
+                deploy_id, deploy_success = _execute_deployment(tool_name, deploy_token, force_run, force_build)
                 if not deploy_success:
                     print(f"Deployment failed for {tool_name} ({deploy_id})")
                     if TARGET_USER:
