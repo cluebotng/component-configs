@@ -1,7 +1,3 @@
-source:
-  url: https://github.com/cluebotng/component-configs.git
-  branch: main
-  path: cluebotng-staging.yaml
 components:
   core:
     build:
