@@ -275,7 +275,7 @@ def _ensure_kubernetes_object(
         return _delete_kubernetes_object(c, obj.k8s_type, obj.name)
 
     # Whack the object into the cluster
-    print(f"Applying to {tool_name}: {obj}")
+    print(f"Applying {obj}")
     return _apply_kubernetes_object(c, obj.as_k8s_object())
 
 
@@ -354,9 +354,9 @@ def _execute_deployment(
     return deploy_id, False
 
 
-def _show_deployment(c: Connection, tool_name: str, deploy_token: str) -> None:
+def _show_deployment(c: Connection, tool_name: str, deploy_id: str) -> None:
     c.sudo(
-        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components deployment show '{deploy_token}'",
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components deployment show '{deploy_id}'",
     )
 
 
@@ -475,7 +475,7 @@ def update_component_config(_ctx):
     for tool_name in _get_target_tools():
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
-            print(f"Applying config for {tool_name}")
+            print(f"Applying deployment config")
             _setup_component_configs(c, tool_name)
 
 
@@ -494,7 +494,8 @@ def execute_deployment(_ctx, force_run: bool = False, force_build: bool = False)
                     print(f"Deployment failed for {tool_name} ({deploy_id})")
                     if TARGET_USER:
                         # If we are executing for a single tool, the exit with a failure code
-                        _show_deployment(c, tool_name, deploy_id)
+                        if deploy_id is not None:
+                            _show_deployment(c, tool_name, deploy_id)
                         sys.exit(1)
 
 
@@ -571,8 +572,7 @@ def purge_tool_account(_ctx):
         hide="stdout",
     ).stdout.strip()
 
-    # Bug: T429229
-    for build in json.loads("{}" if "No builds found" in raw_build_output else raw_build_output).get("builds", []):
+    for build in json.loads(raw_build_output).get("builds", []):
         c.sudo(
             f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' toolforge build delete -y {build['build_id']}",
             hide="stdout",
@@ -588,7 +588,7 @@ def purge_tool_account(_ctx):
     print(f"Removing deployments for {TARGET_USER}")
     raw_deployment_list_output = c.sudo(
         f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' toolforge components deployment list --json",
-        hide="stdout",
+        hide="both",
         warn=True,
     )
     raw_deployment_output = raw_deployment_list_output.stdout or "{}"
@@ -606,8 +606,13 @@ def purge_tool_account(_ctx):
         c.sudo(
             f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / TARGET_USER}' "
             f"toolforge components deployment delete --yes-im-sure {deployment['deploy_id']}",
-            hide="stdout",
+            hide="both",
         )
+
+    # Clean k8 resources
+    print(f"Removing k8 objects for {TARGET_USER}")
+    c.sudo("kubectl delete --all NetworkPolicy", hide="both")
+    c.sudo("kubectl delete --all HttpRoute", hide="both")
 
 
 @task()
@@ -632,3 +637,9 @@ def dologmsg(ctx, message):
         sys.exit(1)
 
     _dologmsg(TARGET_USER, message)
+
+
+@task()
+def print_tools(ctx):
+    for tool_name in _get_target_tools():
+        print(tool_name)
