@@ -102,13 +102,6 @@ components:
       command: ./manage.py add_reported_edits
       schedule: 55 * * * *
       timeout: 3600
-  add-edits-to-queue:
-    build:
-      reuse_from: cluebotng-reviewer
-    run:
-      command: ./manage.py add_edits_to_queue
-      schedule: 13 6 * * *
-      timeout: 3600
   ## Helper jobs
   add-reviews-from-report:
     build:
