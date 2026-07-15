@@ -13,7 +13,7 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: feature/cleanup-event-stream-errors
+      ref: feature/handle-internal-mysql-errors
     run:
       command: run-cbng
       port: 9095
