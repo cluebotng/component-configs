@@ -13,7 +13,7 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: feature/tweak-http-stream-reconnection-logic
+      ref: feature/cleanup-ip-based-user-logic
     run:
       command: run-cbng
       port: 9095
