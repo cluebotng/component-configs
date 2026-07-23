@@ -13,7 +13,7 @@ components:
   bot:
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: feature/add-basic-api-retry
+      ref: feature/refactor-replica-database-logic
     run:
       command: run-cbng
       port: 9095
