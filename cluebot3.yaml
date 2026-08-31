@@ -2,7 +2,7 @@ components:
   cluebot3:
     build:
       repository: https://github.com/cluebotng/cluebot3.git
-      ref: feature/update-archive-key-handling
+      ref: refs/tags/v3.0.0
     run:
       command: run-bot
       memory: 1Gi
