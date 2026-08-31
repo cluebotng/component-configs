@@ -82,7 +82,7 @@ components:
   monitoring-toolforge:
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
-      ref: feature/track-replica-lag
+      ref: refs/tags/v2.0.0
     run:
       command: run
       port: 8000
