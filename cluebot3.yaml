@@ -2,7 +2,7 @@ components:
   cluebot3:
     build:
       repository: https://github.com/cluebotng/cluebot3.git
-      ref: refs/tags/v4.1.0
+      ref: feature/rewrite-broken-configs
     run:
       command: run-bot
       memory: 1Gi
