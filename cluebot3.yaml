@@ -2,7 +2,7 @@ components:
   cluebot3:
     build:
       repository: https://github.com/cluebotng/cluebot3.git
-      ref: refs/tags/v5.0.0
+      ref: feature/case-sensitive-archive-prefix
     run:
       command: run-bot
       memory: 1Gi
