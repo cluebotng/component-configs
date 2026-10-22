@@ -1,4 +1,5 @@
 components:
+# PHP is disabled pending T442078 or T441917
 #  cluebot3:
 #    build:
 #      repository: https://github.com/cluebotng/cluebot3.git

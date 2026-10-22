@@ -7,6 +7,7 @@ components:
       command: ./cluebotng -l -m live_run
       port: 3565
       health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
+# PHP is disabled pending T442078 or T441917
 #  report-interface:
 #    build:
 #      repository: https://github.com/cluebotng/reporter.git

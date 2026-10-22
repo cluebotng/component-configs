@@ -1,15 +1,16 @@
 components:
   # Core services - see utilities repo (until components-api is stable)
-#  core:
-#    build:
-#      repository: https://github.com/cluebotng/external-core.git
-#      ref: refs/tags/v1.5.28
-#    run:
-#      command: ./cluebotng -l -m live_run
-#      port: 3565
-#      memory: 1Gi
-#      cpu: '1'
-#      health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
+  core:
+    build:
+      repository: https://github.com/cluebotng/external-core.git
+      ref: refs/tags/v1.5.28
+    run:
+      command: ./cluebotng -l -m live_run
+      port: 3565
+      memory: 1Gi
+      cpu: '1'
+      health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
+# PHP is disabled pending T442078 or T441917
 #  bot:
 #    build:
 #      repository: https://github.com/cluebotng/bot.git
@@ -44,21 +45,28 @@ components:
     run:
       command: web
       port: 8000
-      health_check_http: /api/?action=health.check
+      health_check_http: internal/health/
       replicas: 2
   report-review-import:
     build:
       reuse_from: report-interface
     run:
-      command: curl -s https://cluebotng.toolforge.org/api/?action=review.import
+      command: ./manage.py import_review_statuses
+      schedule: '5 * * * *'
+      timeout: 3600
+  report-sync-admin-rights:
+    build:
+      reuse_from: report-interface
+    run:
+      command: ./manage.py sync_admin_rights
       schedule: '13 * * * *'
       timeout: 3600
   report-send-whitelisted-to-review:
     build:
       reuse_from: report-interface
     run:
-      command: php -f scripts/send_whitelisted_users_to_review.php
-      schedule: '13 2 * * *'
+      command: ./manage.py send_whitelisted_users_to_review
+      schedule: '45 2 * * *'
       timeout: 3600
   # Monitoring
   grafana-alloy:
