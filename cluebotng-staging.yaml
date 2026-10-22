@@ -1,4 +1,4 @@
-components
+components:
   core:
     build:
       repository: https://github.com/cluebotng/external-core.git
@@ -7,15 +7,15 @@ components
       command: ./cluebotng -l -m live_run
       port: 3565
       health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
-  report-interface:
-    build:
-      repository: https://github.com/cluebotng/reporter.git
-      ref: refs/tags/v1.0.0
-    run:
-      command: web
-      port: 8000
-      health_check_http: /api/?action=health.check
-      replicas: 2
+#  report-interface:
+#    build:
+#      repository: https://github.com/cluebotng/reporter.git
+#      ref: refs/tags/v1.0.0
+#    run:
+#      command: web
+#      port: 8000
+#      health_check_http: /api/?action=health.check
+#      replicas: 2
   grafana-alloy:
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git

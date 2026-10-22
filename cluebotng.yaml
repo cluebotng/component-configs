@@ -10,16 +10,16 @@ components:
       memory: 1Gi
       cpu: '1'
       health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
-  bot:
-    build:
-      repository: https://github.com/cluebotng/bot.git
-      ref: refs/tags/v5.2.13
-    run:
-      command: run-cbng
-      port: 9095
-      memory: 2Gi
-      cpu: '1'
-      health_check_script: health-check
+#  bot:
+#    build:
+#      repository: https://github.com/cluebotng/bot.git
+#      ref: refs/tags/v5.2.13
+#    run:
+#      command: run-cbng
+#      port: 9095
+#      memory: 2Gi
+#      cpu: '1'
+#      health_check_script: health-check
   # Supporting services
   redis:
     build:

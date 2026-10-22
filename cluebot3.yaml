@@ -1,23 +1,23 @@
 components:
-  cluebot3:
-    build:
-      repository: https://github.com/cluebotng/cluebot3.git
-      ref: refs/tags/v5.1.6
-    run:
-      command: run-bot
-      memory: 1Gi
-      cpu: '2'
-      health_check_script: health-check
-  # Cleanup
-  run-cleanup:
-    build:
-      reuse_from: cluebot3
-    run:
-      command: run-cleanup
-      memory: 1Gi
-      cpu: '2'
-      schedule: '13 1 * * *'
-      timeout: 21600 # 6 hours
+#  cluebot3:
+#    build:
+#      repository: https://github.com/cluebotng/cluebot3.git
+#      ref: refs/tags/v5.1.6
+#    run:
+#      command: run-bot
+#      memory: 1Gi
+#      cpu: '2'
+#      health_check_script: health-check
+#  # Cleanup
+#  run-cleanup:
+#    build:
+#      reuse_from: cluebot3
+#    run:
+#      command: run-cleanup
+#      memory: 1Gi
+#      cpu: '2'
+#      schedule: '13 1 * * *'
+#      timeout: 21600 # 6 hours
   # Monitoring
   grafana-alloy:
     build:
