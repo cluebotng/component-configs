@@ -39,8 +39,8 @@ components:
   # Report interface
   report-interface:
     build:
-      repository: https://github.com/cluebotng/report.git
-      ref: refs/tags/v1.10.14
+      repository: https://github.com/cluebotng/reporter.git
+      ref: refs/tags/v1.0.0
     run:
       command: web
       port: 8000
