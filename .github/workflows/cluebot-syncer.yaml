@@ -1,5 +1,5 @@
 name: 'cluebot-syncer'
-on: { push: { branches: [ main ], paths: [ 'cluebot-syncer.yaml', 'config/general.yaml', 'config/network-policies/cluebot-syncer.yaml', 'config/web-services/cluebot-syncer.yaml', ] }, workflow_dispatch: { } }
+on: { push: { branches: [ main ], paths: [ 'cluebot-syncer.yaml', 'config/general.yaml', 'config/network-policies/cluebot-syncer.yaml', ] }, workflow_dispatch: { } }
 concurrency:
   group: cluebot-syncer
 jobs:
@@ -32,19 +32,9 @@ jobs:
           user: 'cluebot-syncer'
           task: execute-deployment
           ssh_key: ${{ secrets.CI_SSH_KEY }}
-  update-webservice:
-    runs-on: ubuntu-latest
-    needs: [update-network-policies, update-component-config, execute-deployment]
-    steps:
-      - uses: actions/checkout@v6
-      - uses: cluebotng/ci-execute-fabric@main
-        with:
-          user: 'cluebot-syncer'
-          task: update-webservice
-          ssh_key: ${{ secrets.CI_SSH_KEY }}
   dologmsg-success:
     runs-on: ubuntu-latest
-    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]
+    needs: [update-network-policies, update-component-config, execute-deployment]
     steps:
       - uses: actions/checkout@v6
       - uses: cluebotng/ci-execute-fabric@main
@@ -55,7 +45,7 @@ jobs:
           ssh_key: ${{ secrets.CI_SSH_KEY }}
   dologmsg-failure:
     runs-on: ubuntu-latest
-    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]
+    needs: [update-network-policies, update-component-config, execute-deployment]
     if: ${{ failure() }}
     steps:
       - uses: actions/checkout@v6

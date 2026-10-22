@@ -19,44 +19,6 @@ EMIT_LOG_MESSAGES = os.environ.get("EMIT_LOG_MESSAGES", "true") == "true"
 
 
 @dataclasses.dataclass
-class WebServiceHttpRouteConfig:
-    tool_name: str
-    target_component: str
-    target_port: int
-
-    def __str__(self) -> str:
-        return f"HttpRoute(backend={self.target_component}, port={self.target_port})"
-
-    @staticmethod
-    def from_values(tool_name: str, data: Dict[str, Any]) -> "WebServiceHttpRouteConfig":
-        return WebServiceHttpRouteConfig(
-            tool_name=tool_name,
-            target_component=data.get("component"),
-            target_port=data.get("port"),
-        )
-
-    def as_k8s_object(self) -> Dict[str, Any]:
-        return {
-            "apiVersion": "gateway.networking.k8s.io/v1",
-            "kind": "HTTPRoute",
-            "metadata": {
-                "name": self.tool_name,
-                "labels": {
-                    "app.kubernetes.io/component": "web",
-                    "app.kubernetes.io/managed-by": "component-configs",
-                    "toolforge": "tool",
-                    "name": self.tool_name,
-                },
-            },
-            "spec": {
-                "parentRefs": [{"namespace": "istio-gateway", "name": "toolforge"}],
-                "hostnames": [f"{self.tool_name}.toolforge.org"],
-                "rules": [{"backendRefs": [{"name": self.target_component, "port": self.target_port}]}],
-            },
-        }
-
-
-@dataclasses.dataclass
 class NetworkPolicyPodIngress:
     name: str
 
@@ -178,22 +140,6 @@ def _get_target_tools() -> List[str]:
     return [config.name.split(".yaml")[0] for config in PosixPath(__file__).parent.glob("*.yaml")]
 
 
-def _get_web_services() -> Dict[str, List[WebServiceHttpRouteConfig]]:
-    config = {}
-    config_path = PosixPath(__file__).parent / "config" / "web-services"
-    if config_path.is_dir():
-        for path in config_path.glob("*.yaml"):
-            with path.open("r") as fh:
-                config.update({path.name.split(".yaml")[0]: yaml.load(fh.read(), Loader=yaml.SafeLoader)})
-
-    return {
-        tool_name: [
-            WebServiceHttpRouteConfig.from_values(tool_name, config),
-        ]
-        for tool_name, config in config.items()
-    }
-
-
 def _get_network_policies() -> Dict[str, List[NetworkPolicy]]:
     config = {}
     config_path = PosixPath(__file__).parent / "config" / "network-policies"
@@ -269,7 +215,7 @@ def _delete_kubernetes_object(c: Connection, obj_type: str, obj_name: str) -> bo
 def _ensure_kubernetes_object(
     c: Connection,
     tool_name: str,
-    obj: WebServiceHttpRouteConfig | NetworkPolicy,
+    obj: NetworkPolicy,
 ) -> bool:
     if hasattr(obj, "delete") and obj.delete:
         return _delete_kubernetes_object(c, obj.k8s_type, obj.name)
@@ -367,7 +313,6 @@ def _generate_workflow(tool_name: str):
     config += f"'{tool_name}.yaml', "
     config += "'config/general.yaml', "
     config += f"'config/network-policies/{tool_name}.yaml', "
-    config += f"'config/web-services/{tool_name}.yaml', "
     config += "] }, workflow_dispatch: { } }\n"
     config += f"concurrency:\n  group: {tool_name}\n"
     config += "jobs:\n"
@@ -405,20 +350,9 @@ def _generate_workflow(tool_name: str):
     config += "          task: execute-deployment\n"
     config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
 
-    config += "  update-webservice:\n"
-    config += "    runs-on: ubuntu-latest\n"
-    config += "    needs: [update-network-policies, update-component-config, execute-deployment]\n"
-    config += "    steps:\n"
-    config += "      - uses: actions/checkout@v6\n"
-    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
-    config += "        with:\n"
-    config += f"          user: '{tool_name}'\n"
-    config += "          task: update-webservice\n"
-    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
-
     config += "  dologmsg-success:\n"
     config += "    runs-on: ubuntu-latest\n"
-    config += "    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]\n"
+    config += "    needs: [update-network-policies, update-component-config, execute-deployment]\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v6\n"
     config += "      - uses: cluebotng/ci-execute-fabric@main\n"
@@ -432,7 +366,7 @@ def _generate_workflow(tool_name: str):
 
     config += "  dologmsg-failure:\n"
     config += "    runs-on: ubuntu-latest\n"
-    config += "    needs: [update-network-policies, update-component-config, execute-deployment, update-webservice]\n"
+    config += "    needs: [update-network-policies, update-component-config, execute-deployment]\n"
     config += "    if: ${{ failure() }}\n"
     config += "    steps:\n"
     config += "      - uses: actions/checkout@v6\n"
@@ -496,21 +430,6 @@ def execute_deployment(_ctx, force_run: bool = False, force_build: bool = False)
                         # If we are executing for a single tool, the exit with a failure code
                         if deploy_id is not None:
                             _show_deployment(c, tool_name, deploy_id)
-                        sys.exit(1)
-
-
-@task()
-def update_webservice(_ctx):
-    """Execute a webservice deployment for a tool account."""
-    webservices = _get_web_services()
-    for tool_name in _get_target_tools():
-        if TARGET_USER is None or tool_name == TARGET_USER:
-            c = _get_connection_for_tool(tool_name)
-            for webservice in webservices.get(tool_name, []):
-                if not _ensure_kubernetes_object(c, tool_name, webservice):
-                    print(f"Deployment failed for {tool_name}")
-                    if TARGET_USER:
-                        # If we are executing for a single tool, the exit with a failure code
                         sys.exit(1)
 
 
@@ -620,7 +539,6 @@ def deploy(ctx):
     update_network_policies(ctx)
     update_component_config(ctx)
     execute_deployment(ctx)
-    update_webservice(ctx)
     update_static_files(ctx)
 
 
