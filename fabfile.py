@@ -257,8 +257,8 @@ def _start_deployment(tool_name: str, deploy_token: str, force_run: bool, force_
         f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment",
         params={
             "token": deploy_token,
-            "force_run": force_run,
-            "force_build": force_build,
+            "force-run": force_run,
+            "force-build": force_build,
         },
     )
     if r.status_code == 409:
