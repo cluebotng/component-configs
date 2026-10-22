@@ -1,25 +1,25 @@
 components:
   # Core services - see utilities repo (until components-api is stable)
-  core:
-    build:
-      repository: https://github.com/cluebotng/external-core.git
-      ref: refs/tags/v1.5.28
-    run:
-      command: ./cluebotng -l -m live_run
-      port: 3565
-      memory: 1Gi
-      cpu: '1'
-      health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
-      #  bot:
-      #    build:
-      #      repository: https://github.com/cluebotng/bot.git
-      #      ref: refs/tags/v5.2.13
-      #    run:
-      #      command: run-cbng
-      #      port: 9095
-      #      memory: 2Gi
-      #      cpu: '1'
-      #      health_check_script: health-check
+#  core:
+#    build:
+#      repository: https://github.com/cluebotng/external-core.git
+#      ref: refs/tags/v1.5.28
+#    run:
+#      command: ./cluebotng -l -m live_run
+#      port: 3565
+#      memory: 1Gi
+#      cpu: '1'
+#      health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
+#  bot:
+#    build:
+#      repository: https://github.com/cluebotng/bot.git
+#      ref: refs/tags/v5.2.13
+#    run:
+#      command: run-cbng
+#      port: 9095
+#      memory: 2Gi
+#      cpu: '1'
+#      health_check_script: health-check
   # Supporting services
   redis:
     build:
