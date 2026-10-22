@@ -1,2 +1,2 @@
-component: report-interface
+component: reporter-interface
 port: 8000

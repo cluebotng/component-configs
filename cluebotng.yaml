@@ -38,7 +38,7 @@ components:
       port: 9334
       health_check_http: /health
   # Report interface
-  report-interface:
+  reporter-interface:
     build:
       repository: https://github.com/cluebotng/reporter.git
       ref: refs/tags/v1.1.0
@@ -49,21 +49,21 @@ components:
       replicas: 2
   report-review-import:
     build:
-      reuse_from: report-interface
+      reuse_from: reporter-interface
     run:
       command: ./manage.py import_review_statuses
       schedule: '5 * * * *'
       timeout: 3600
   report-sync-admin-rights:
     build:
-      reuse_from: report-interface
+      reuse_from: reporter-interface
     run:
       command: ./manage.py sync_admin_rights
       schedule: '13 * * * *'
       timeout: 3600
   report-send-whitelisted-to-review:
     build:
-      reuse_from: report-interface
+      reuse_from: reporter-interface
     run:
       command: ./manage.py send_whitelisted_users_to_review
       schedule: '45 2 * * *'
