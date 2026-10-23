@@ -12,7 +12,7 @@
   match: redis
   allow:
     - pod: bot
-    - pod: report-interface
+    - pod: reporter-interface
 
 - name: restrict-grafana-alloy
   match: grafana-alloy
