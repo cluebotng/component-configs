@@ -3,7 +3,7 @@ components:
   repository-syncer:
     build:
       repository: https://github.com/cluebotng/repository-syncer.git
-      ref: refs/tags/v1.5.0
+      ref: refs/tags/v1.5.1
     run:
       schedule: '*/15 * * * *'
       timeout: 3600
