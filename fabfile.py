@@ -296,8 +296,8 @@ def _execute_deployment(
             time.sleep(1)
             continue
 
-    print(f"Deployment is not pending, running or successful: {deployment_status}")
-    return deploy_id, False
+        print(f"Deployment is not pending, running or successful: {deployment_status}")
+        return deploy_id, False
 
 
 def _show_deployment(c: Connection, tool_name: str, deploy_id: str) -> None:
