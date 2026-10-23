@@ -1,3 +1,7 @@
 - source: copy-kube-certs-to-env.sh
   target: copy-kube-certs-to-env
   mode: 750
+
+- source: really-really-complete-a-deploy.sh
+  target: really-really-complete-a-deploy
+  mode: 750

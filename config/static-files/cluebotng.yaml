@@ -1,3 +1,7 @@
 - source: copy-worker-credentials-to-env.sh
   target: copy-worker-credentials-to-env
   mode: 750
+
+- source: really-really-complete-a-deploy.sh
+  target: really-really-complete-a-deploy
+  mode: 750

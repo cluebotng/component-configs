@@ -1,3 +1,7 @@
 - source: trove-mysql.sh
   target: trove-mysql
   mode: 750
+
+- source: really-really-complete-a-deploy.sh
+  target: really-really-complete-a-deploy
+  mode: 750
