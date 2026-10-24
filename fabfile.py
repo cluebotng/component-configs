@@ -98,6 +98,7 @@ class StaticFile:
     source: str
     target: str
     mode: str
+    replace: dict[str, str]
 
     def load(self) -> str:
         path = PosixPath(__file__).parent / "config" / "static-files" / "files" / self.source
@@ -107,9 +108,10 @@ class StaticFile:
     @staticmethod
     def from_values(data: Dict[str, Any]) -> "StaticFile":
         return StaticFile(
-            source=data.get("source"),
-            target=data.get("target"),
+            source=data["source"],
+            target=data["target"],
             mode=data.get("mode", "0600"),
+            replace=data.get("replace", {}),
         )
 
 
@@ -227,6 +229,8 @@ def _ensure_kubernetes_object(
 
 def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) -> bool:
     contents = static_file.load()
+    for k, v in static_file.replace.items():
+        contents = contents.replace(f'{{{{ {k} }}}}', v)
     encoded_contents = base64.b64encode(contents.encode("utf-8")).decode("utf-8")
     target_path = TOOL_BASE_DIR / tool_name / static_file.target
 

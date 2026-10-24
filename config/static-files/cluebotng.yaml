@@ -5,3 +5,9 @@
 - source: really-really-complete-a-deploy.sh
   target: really-really-complete-a-deploy
   mode: 750
+
+- source: django-manage.sh
+  target: reporter-manage
+  mode: 750
+  replace:
+    COMPONENT_NAME: reporter-interface
