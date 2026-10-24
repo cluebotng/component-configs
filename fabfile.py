@@ -279,7 +279,7 @@ def _get_deployment_status(tool_name: str, deploy_id: str, deploy_token: str) ->
         params={"token": deploy_token},
     )
     _raise_for_status_with_no_url(r)
-    return r.json()["data"].get("status", "unknown")
+    return r.json()["data"].get("status", "pending")
 
 
 def _execute_deployment(
