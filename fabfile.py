@@ -4,14 +4,13 @@ import json
 import os
 import sys
 import time
-
-import yaml
 from pathlib import PosixPath
-from typing import List, Optional, Dict, Any
+from typing import Any
 
 import requests
+import yaml
+from fabric import Config, Connection, task
 from requests.exceptions import HTTPError
-from fabric import Connection, Config, task
 
 TARGET_USER = os.environ.get("TARGET_USER")
 TOOL_BASE_DIR = PosixPath("/data/project")
@@ -22,11 +21,11 @@ EMIT_LOG_MESSAGES = os.environ.get("EMIT_LOG_MESSAGES", "true") == "true"
 class NetworkPolicyPodIngress:
     name: str
 
-    def as_k8s_object(self) -> Dict[str, Any]:
+    def as_k8s_object(self) -> dict[str, Any]:
         return {"podSelector": {"matchLabels": {"app.kubernetes.io/name": self.name}}}
 
     @staticmethod
-    def from_values(data: Dict[str, Any]) -> "NetworkPolicyPodIngress":
+    def from_values(data: dict[str, Any]) -> "NetworkPolicyPodIngress":
         return NetworkPolicyPodIngress(name=data.get("pod"))
 
 
@@ -34,11 +33,11 @@ class NetworkPolicyPodIngress:
 class NetworkPolicyNamespaceIngress:
     name: str
 
-    def as_k8s_object(self) -> Dict[str, Any]:
+    def as_k8s_object(self) -> dict[str, Any]:
         return {"namespaceSelector": {"matchLabels": {"name": self.name}}}
 
     @staticmethod
-    def from_values(data: Dict[str, Any]) -> "NetworkPolicyNamespaceIngress":
+    def from_values(data: dict[str, Any]) -> "NetworkPolicyNamespaceIngress":
         return NetworkPolicyNamespaceIngress(name=data.get("namespace"))
 
 
@@ -46,7 +45,7 @@ class NetworkPolicyNamespaceIngress:
 class NetworkPolicy:
     name: str
     match: str
-    allow: List[NetworkPolicyPodIngress | NetworkPolicyNamespaceIngress]
+    allow: list[NetworkPolicyPodIngress | NetworkPolicyNamespaceIngress]
     delete: bool
 
     @property
@@ -56,7 +55,7 @@ class NetworkPolicy:
     def __str__(self) -> str:
         return f"NetworkPolicy(name={self.name})"
 
-    def as_k8s_object(self) -> Dict[str, Any]:
+    def as_k8s_object(self) -> dict[str, Any]:
         return {
             "apiVersion": "networking.k8s.io/v1",
             "kind": "NetworkPolicy",
@@ -74,7 +73,7 @@ class NetworkPolicy:
         }
 
     @staticmethod
-    def from_values(data: Dict[str, Any]) -> "NetworkPolicy":
+    def from_values(data: dict[str, Any]) -> "NetworkPolicy":
         should_delete = data.get("delete", False)
 
         allow_from = []
@@ -106,7 +105,7 @@ class StaticFile:
             return fh.read()
 
     @staticmethod
-    def from_values(data: Dict[str, Any]) -> "StaticFile":
+    def from_values(data: dict[str, Any]) -> "StaticFile":
         return StaticFile(
             source=data["source"],
             target=data["target"],
@@ -138,11 +137,11 @@ def _get_connection_for_tool(tool_name: str) -> Connection:
     )
 
 
-def _get_target_tools() -> List[str]:
+def _get_target_tools() -> list[str]:
     return [config.name.split(".yaml")[0] for config in PosixPath(__file__).parent.glob("*.yaml")]
 
 
-def _get_network_policies() -> Dict[str, List[NetworkPolicy]]:
+def _get_network_policies() -> dict[str, list[NetworkPolicy]]:
     config = {}
     config_path = PosixPath(__file__).parent / "config" / "network-policies"
     if config_path.is_dir():
@@ -155,7 +154,7 @@ def _get_network_policies() -> Dict[str, List[NetworkPolicy]]:
     }
 
 
-def _get_static_files() -> Dict[str, List[StaticFile]]:
+def _get_static_files() -> dict[str, list[StaticFile]]:
     config = {}
     config_path = PosixPath(__file__).parent / "config" / "static-files"
     if config_path.is_dir():
@@ -195,7 +194,7 @@ def _get_deployment_token(c: Connection, tool_name: str):
     return deployment_token
 
 
-def _apply_kubernetes_object(c: Connection, k8s_obj: Dict[str, Any]) -> bool:
+def _apply_kubernetes_object(c: Connection, k8s_obj: dict[str, Any]) -> bool:
     obj_as_yaml = yaml.dump(k8s_obj)
     encoded_contents = base64.b64encode(obj_as_yaml.encode("utf-8")).decode("utf-8")
     ret = c.sudo(f'bash -c "base64 -d <<<{encoded_contents} | kubectl apply -f-"', hide="both")
@@ -230,7 +229,7 @@ def _ensure_kubernetes_object(
 def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) -> bool:
     contents = static_file.load()
     for k, v in static_file.replace.items():
-        contents = contents.replace(f'{{{{ {k} }}}}', v)
+        contents = contents.replace(f"{{{{ {k} }}}}", v)
     encoded_contents = base64.b64encode(contents.encode("utf-8")).decode("utf-8")
     target_path = TOOL_BASE_DIR / tool_name / static_file.target
 
@@ -256,7 +255,7 @@ def _dologmsg(tool_name: str, message: str):
         c.run(f"echo '{feed_message}' > /dev/tcp/wm-bot.wm-bot.wmcloud.org/64835 || true")
 
 
-def _start_deployment(tool_name: str, deploy_token: str, force_run: bool, force_build: bool) -> Optional[str]:
+def _start_deployment(tool_name: str, deploy_token: str, force_run: bool, force_build: bool) -> str | None:
     r = requests.post(
         f"https://api.svc.toolforge.org/components/v1/tool/{tool_name}/deployment",
         params={
@@ -413,7 +412,7 @@ def update_component_config(_ctx):
     for tool_name in _get_target_tools():
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
-            print(f"Applying deployment config")
+            print("Applying deployment config")
             _setup_component_configs(c, tool_name)
 
 
