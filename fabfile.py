@@ -26,7 +26,7 @@ class NetworkPolicyPodIngress:
 
     @staticmethod
     def from_values(data: dict[str, Any]) -> "NetworkPolicyPodIngress":
-        return NetworkPolicyPodIngress(name=data.get("pod"))
+        return NetworkPolicyPodIngress(name=data["pod"])
 
 
 @dataclasses.dataclass
@@ -38,7 +38,7 @@ class NetworkPolicyNamespaceIngress:
 
     @staticmethod
     def from_values(data: dict[str, Any]) -> "NetworkPolicyNamespaceIngress":
-        return NetworkPolicyNamespaceIngress(name=data.get("namespace"))
+        return NetworkPolicyNamespaceIngress(name=data["namespace"])
 
 
 @dataclasses.dataclass
@@ -85,8 +85,8 @@ class NetworkPolicy:
                     allow_from.append(NetworkPolicyPodIngress.from_values(entry))
 
         return NetworkPolicy(
-            name=data.get("name"),
-            match=data.get("match"),
+            name=data["name"],
+            match=data["match"],
             allow=allow_from,
             delete=should_delete,
         )
@@ -115,19 +115,11 @@ class StaticFile:
 
 
 def _raise_for_status_with_no_url(response: requests.Response) -> None:
-    if isinstance(response.reason, bytes):
-        try:
-            reason = response.reason.decode("utf-8")
-        except UnicodeDecodeError:
-            reason = response.reason.decode("iso-8859-1")
-    else:
-        reason = response.reason
-
     if 400 <= response.status_code < 500:
-        raise HTTPError(f"{response.status_code} Client Error: {reason}", response=response)
+        raise HTTPError(f"{response.status_code} Client Error: {response.reason}", response=response)
 
     elif 500 <= response.status_code < 600:
-        raise HTTPError(f"{response.status_code} Server Error: {reason}", response=response)
+        raise HTTPError(f"{response.status_code} Server Error: {response.reason}", response=response)
 
 
 def _get_connection_for_tool(tool_name: str) -> Connection:
