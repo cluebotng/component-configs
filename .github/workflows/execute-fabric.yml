@@ -1,0 +1,59 @@
+name: Execute a fabric task
+on:
+  workflow_call:
+    inputs:
+      user:
+        required: true
+        type: string
+      task:
+        required: true
+        type: string
+      argument:
+        required: false
+        type: string
+        default: ''
+    secrets:
+      ssh_key:
+        required: true
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: setup python
+        uses: infrabits/ci-setup-python@9233f26fef5b34b29026b53a08550c8371711536 # v1.1.0
+        with:
+          install_dependencies: true
+          install_test_dependencies: false
+          install_tox: false
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+
+          # https://wikitech.wikimedia.org/wiki/Help:SSH_Fingerprints/login.toolforge.org
+          cat > ~/.ssh/known_hosts <<EOF
+          login.toolforge.org ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDGdp0Qgi9DdNDPkeXixXZeukq8jAdoYGbigjVT5FE49vB+7VzKhL4xet+Y0sWTgkNJdUmNmElfW1f6PiM5s/IqH2Oy4rpwcquxMr//EDUmbu1br1+pJGjmvzSJ9W91A9B1i5EbBi/6sAINRS6+VONXmzOhfcHQROWkg2wW2oQmwDkqLnp8E23P9A2L4A1QcllP1+BuFZe7xH9jQMDpK/bt7SePUfdZZItoWPlqBXehGS/SIyEgbHhOkw91LMshh0wSthOZgIJwmRA+ka0LW9mzfyLkX8PMS87MqtwQOduj6ZNJsC44a/5tP7KYpjkXRR4RPu18cYdNgQPXFZt2PQ56vR5PmqUPcbqmoXNFKeL+/87CKnwOeBIr493J28Ij13t7w3svKLROAgEV3p6alkQ07vvjlHubMKytbRoLZ5ayEzBnp/iJZfhfxQF8OcWZJ0LkWLb2Zzcj8OPDjD6GKDo98j+fWmTbtjPX8tz0B0RrMj3CDqSH9cQGVm55dnwxDEs=
+          login.toolforge.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGNwP+8lSo0NF6vl1EM0ZeKY50eedW3g4IwOm+AFNgPp6OZhlha8tjDjynSjXbAxs1I8ngc7L2hHGeaLSwCKf90=
+          EOF
+
+          cat > ~/.ssh/config <<EOF
+          Host login.toolforge.org
+            StrictHostKeyChecking yes
+            User damian-scripts
+          EOF
+
+          ssh-agent -a "$SSH_AUTH_SOCK"
+          base64 -d <<<"$SSH_KEY" | ssh-add -
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh-auth.sock
+          SSH_KEY: ${{ secrets.ssh_key }}
+
+      - name: Execute fabric
+        run: poetry run fab "$TASK" ${{ inputs.argument }}
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh-auth.sock
+          TARGET_USER: ${{ inputs.user }}
+          TASK: ${{ inputs.task }}

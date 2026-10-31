@@ -362,6 +362,31 @@ def _show_deployment(c: Connection, tool_name: str, deploy_id: str) -> None:
 
 def _generate_workflow(tool_name: str):
     # We do this to avoid `yaml` as a dep, it's simple enough
+    def _job(name: str, task: str, needs: list[str], argument: str | None = None, condition: str | None = None) -> str:
+        job = f"  {name}:\n"
+        if needs:
+            job += f"    needs: [{', '.join(needs)}]\n"
+        if condition:
+            job += f"    if: {condition}\n"
+        job += "    uses: ./.github/workflows/execute-fabric.yml\n"
+        job += "    with:\n"
+        job += f"      user: '{tool_name}'\n"
+        job += f"      task: {task}\n"
+        if argument:
+            job += f"      argument: {argument}\n"
+        job += "    secrets:\n"
+        job += "      ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
+        return job
+
+    def _dologmsg_argument(status: str) -> str:
+        return (
+            f"\"--message='Deployment {status}: "
+            "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} "
+            "(https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'\""
+        )
+
+    deployment_jobs = ["update-network-policies", "update-component-config", "execute-deployment"]
+
     config = f"name: '{tool_name}'\n"
     config += "on: { push: { branches: [ main ], paths: [ "
     config += f"'{tool_name}.yaml', "
@@ -372,66 +397,11 @@ def _generate_workflow(tool_name: str):
     config += "jobs:\n"
     # Until T401868 is resolved, update the tool with the config we want deployed
     # Note: the config will not be re-fetched as `source_url` cannot be rewritten on the same sha... so this is '1 off'
-    config += "  update-network-policies:\n"
-    config += "    runs-on: ubuntu-latest\n"
-    config += "    steps:\n"
-    config += "      - uses: actions/checkout@v6\n"
-    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
-    config += "        with:\n"
-    config += f"          user: '{tool_name}'\n"
-    config += "          task: update-network-policies\n"
-    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
-
-    config += "  update-component-config:\n"
-    config += "    runs-on: ubuntu-latest\n"
-    config += "    needs: [update-network-policies]\n"
-    config += "    steps:\n"
-    config += "      - uses: actions/checkout@v6\n"
-    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
-    config += "        with:\n"
-    config += f"          user: '{tool_name}'\n"
-    config += "          task: update-component-config\n"
-    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
-
-    config += "  execute-deployment:\n"
-    config += "    runs-on: ubuntu-latest\n"
-    config += "    needs: [update-network-policies, update-component-config]\n"
-    config += "    steps:\n"
-    config += "      - uses: actions/checkout@v6\n"
-    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
-    config += "        with:\n"
-    config += f"          user: '{tool_name}'\n"
-    config += "          task: execute-deployment\n"
-    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
-
-    config += "  dologmsg-success:\n"
-    config += "    runs-on: ubuntu-latest\n"
-    config += "    needs: [update-network-policies, update-component-config, execute-deployment]\n"
-    config += "    steps:\n"
-    config += "      - uses: actions/checkout@v6\n"
-    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
-    config += "        with:\n"
-    config += f"          user: '{tool_name}'\n"
-    config += "          task: dologmsg\n"
-    config += "          argument: \"--message='Deployment completed: "
-    config += "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} "
-    config += "(https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'\"\n"
-    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
-
-    config += "  dologmsg-failure:\n"
-    config += "    runs-on: ubuntu-latest\n"
-    config += "    needs: [update-network-policies, update-component-config, execute-deployment]\n"
-    config += "    if: ${{ failure() }}\n"
-    config += "    steps:\n"
-    config += "      - uses: actions/checkout@v6\n"
-    config += "      - uses: cluebotng/ci-execute-fabric@main\n"
-    config += "        with:\n"
-    config += f"          user: '{tool_name}'\n"
-    config += "          task: dologmsg\n"
-    config += "          argument: \"--message='Deployment failed: "
-    config += "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} "
-    config += "(https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'\"\n"
-    config += "          ssh_key: ${{ secrets.CI_SSH_KEY }}\n"
+    config += _job("update-network-policies", "update-network-policies", [])
+    config += _job("update-component-config", "update-component-config", deployment_jobs[:1])
+    config += _job("execute-deployment", "execute-deployment", deployment_jobs[:2])
+    config += _job("dologmsg-success", "dologmsg", deployment_jobs, _dologmsg_argument("completed"))
+    config += _job("dologmsg-failure", "dologmsg", deployment_jobs, _dologmsg_argument("failed"), "${{ failure() }}")
     return config
 
 
