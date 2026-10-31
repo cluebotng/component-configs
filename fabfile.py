@@ -124,6 +124,7 @@ class StaticFile:
         content = self.load()
         if template_variables:
             env = Environment(undefined=StrictUndefined)
+            env.filters["fromjson"] = json.loads
             template = env.from_string(content)
             return template.render(**template_variables)
         return content

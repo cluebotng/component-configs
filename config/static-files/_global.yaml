@@ -2,6 +2,11 @@
   target: scripts/retry-component-deploy-until-complete
   mode: 750
 
+- source: email-forward.j2
+  target: .forward.alerts
+  mode: 644
+  variables: [MONITORING_SEND_ALERTS_TO]
+
 # Old paths
 - target: really-really-complete-a-deploy
   remove: true
