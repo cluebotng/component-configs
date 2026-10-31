@@ -94,12 +94,16 @@ class NetworkPolicy:
 
 @dataclasses.dataclass
 class StaticFile:
-    source: str
+    source: str | None
     target: str
-    mode: str
+    mode: str | None
     replace: dict[str, str]
+    remove: bool
 
     def load(self) -> str:
+        if self.source is None:
+            raise RuntimeError(f"static file most have source: {self}")
+
         path = PosixPath(__file__).parent / "config" / "static-files" / "files" / self.source
         with path.open("r") as fh:
             return fh.read()
@@ -107,10 +111,11 @@ class StaticFile:
     @staticmethod
     def from_values(data: dict[str, Any]) -> "StaticFile":
         return StaticFile(
-            source=data["source"],
+            source=data.get("source"),
             target=data["target"],
             mode=data.get("mode", "0600"),
             replace=data.get("replace", {}),
+            remove=data.get("remove", False),
         )
 
 
@@ -221,6 +226,13 @@ def _ensure_kubernetes_object(
 
 
 def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) -> bool:
+    if static_file.remove:
+        c.sudo(
+            f"bash -c 'rm -f {TOOL_BASE_DIR / tool_name / static_file.target}'",
+            hide="both",
+        )
+        return True
+
     contents = static_file.load()
     for k, v in static_file.replace.items():
         contents = contents.replace(f"{{{{ {k} }}}}", v)
