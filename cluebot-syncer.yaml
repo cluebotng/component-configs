@@ -1,4 +1,8 @@
 # yaml-language-server: $schema=https://gitlab.wikimedia.org/repos/cloud/toolforge/components-api/-/raw/main/openapi/tool-config-schema.json
+defaults:
+  alerts:
+    notify: true
+
 components:
   repository-syncer:
     build:
