@@ -2,11 +2,10 @@
   target: scripts/trove-mysql
   mode: 750
 
-- source: django-manage.sh
+- source: django-manage.j2
   target: scripts/reviewer-manage
   mode: 750
-  replace:
-    COMPONENT_NAME: cluebotng-reviewer
+  replace: {COMPONENT_NAME: cluebotng-reviewer}
 
 # Old paths
 - target: reviewer-manage

@@ -2,11 +2,10 @@
   target: scripts/copy-worker-credentials-to-env
   mode: 750
 
-- source: django-manage.sh
+- source: django-manage.j2
   target: scripts/reporter-manage
   mode: 750
-  replace:
-    COMPONENT_NAME: reporter-interface
+  replace: {COMPONENT_NAME: reporter-interface}
 
 # Old paths
 - target: reporter-manage
