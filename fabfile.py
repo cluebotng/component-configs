@@ -99,6 +99,7 @@ class StaticFile:
     target: str
     mode: str | None
     replace: dict[str, str]
+    variables: list[str]
     remove: bool
 
     def load(self) -> str:
@@ -110,8 +111,15 @@ class StaticFile:
         with path.open("r") as fh:
             return fh.read()
 
-    def render(self) -> str | None:
-        template_variables = self.replace
+    def render(self, data: dict[str, str] | None = None) -> str | None:
+        if data is None:
+            data = {}
+
+        if self.variables and any(k not in data for k in self.variables):
+            print(f"Missing variables for static file: {self.source}")
+            return None
+
+        template_variables = self.replace | {k: data[k] for k in self.variables}
 
         content = self.load()
         if template_variables:
@@ -127,6 +135,7 @@ class StaticFile:
             target=data["target"],
             mode=data.get("mode", "0600"),
             replace=data.get("replace", {}),
+            variables=data.get("variables", []),
             remove=data.get("remove", False),
         )
 
@@ -237,6 +246,31 @@ def _ensure_kubernetes_object(
     return _apply_kubernetes_object(c, obj.as_k8s_object())
 
 
+def _get_template_variables(c: Connection, tool_name: str, variables: list[str]) -> dict[str, str] | None:
+    if not variables:
+        return {}
+
+    raw_build_output = c.sudo(
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge envvars list --json",
+        hide="stdout",
+    ).stdout.strip()
+
+    data = {}
+    for envvar in json.loads(raw_build_output).get("envvars", []):
+        if envvar["name"] in variables:
+            data[envvar["name"]] = envvar["value"]
+
+    have_all_variables = True
+    for variable in variables:
+        if variable not in data:
+            print(f"Failed to find variable {variable}")
+            have_all_variables = False
+
+    if not have_all_variables:
+        return None
+    return data
+
+
 def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) -> bool:
     if static_file.remove:
         c.sudo(
@@ -245,7 +279,11 @@ def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) 
         )
         return True
 
-    contents = static_file.render()
+    data = _get_template_variables(c, tool_name, static_file.variables)
+    if data is None:
+        return False
+
+    contents = static_file.render(data)
     target_path = TOOL_BASE_DIR / tool_name / static_file.target
 
     print(f"Writing {static_file.source} to {target_path.absolute()} ({static_file.mode})")
@@ -562,6 +600,19 @@ def deploy(ctx):
 def clean_deploy(ctx):
     purge_tool_account(ctx)
     deploy(ctx)
+
+
+@task()
+def set_envvar(ctx, name, value):
+    """Set an environment variable in the tool account."""
+    for tool_name in _get_target_tools():
+        if TARGET_USER is None or tool_name == TARGET_USER:
+            c = _get_connection_for_tool(tool_name)
+            c.sudo(
+                f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge envvars create {name}",
+                hide="both",
+                in_stream=io.StringIO(value),
+            )
 
 
 @task()
