@@ -10,6 +10,7 @@ from typing import Any
 import requests
 import yaml
 from fabric import Config, Connection, task
+from jinja2 import Environment, StrictUndefined
 from requests.exceptions import HTTPError
 
 TARGET_USER = os.environ.get("TARGET_USER")
@@ -104,9 +105,20 @@ class StaticFile:
         if self.source is None:
             raise RuntimeError(f"static file most have source: {self}")
 
-        path = PosixPath(__file__).parent / "config" / "static-files" / "files" / self.source
+        source_dir = "templates" if self.source.endswith(".j2") else "files"
+        path = PosixPath(__file__).parent / "config" / "static-files" / source_dir / self.source
         with path.open("r") as fh:
             return fh.read()
+
+    def render(self) -> str | None:
+        template_variables = self.replace
+
+        content = self.load()
+        if template_variables:
+            env = Environment(undefined=StrictUndefined)
+            template = env.from_string(content)
+            return template.render(**template_variables)
+        return content
 
     @staticmethod
     def from_values(data: dict[str, Any]) -> "StaticFile":
@@ -233,9 +245,7 @@ def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) 
         )
         return True
 
-    contents = static_file.load()
-    for k, v in static_file.replace.items():
-        contents = contents.replace(f"{{{{ {k} }}}}", v)
+    contents = static_file.render()
     target_path = TOOL_BASE_DIR / tool_name / static_file.target
 
     print(f"Writing {static_file.source} to {target_path.absolute()} ({static_file.mode})")
