@@ -2,10 +2,6 @@
   target: trove-mysql
   mode: 750
 
-- source: really-really-complete-a-deploy.sh
-  target: really-really-complete-a-deploy
-  mode: 750
-
 - source: django-manage.sh
   target: reviewer-manage
   mode: 750

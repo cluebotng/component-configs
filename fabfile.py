@@ -146,7 +146,7 @@ def _get_network_policies() -> dict[str, list[NetworkPolicy]]:
     }
 
 
-def _get_static_files() -> dict[str, list[StaticFile]]:
+def _get_static_files(target_tools: list[str]) -> dict[str, list[StaticFile]]:
     config = {}
     config_path = PosixPath(__file__).parent / "config" / "static-files"
     if config_path.is_dir():
@@ -154,7 +154,12 @@ def _get_static_files() -> dict[str, list[StaticFile]]:
             with path.open("r") as fh:
                 config.update({path.name.split(".yaml")[0]: yaml.load(fh.read(), Loader=yaml.SafeLoader)})
 
-    return {tool_name: [StaticFile.from_values(config) for config in entries] for tool_name, entries in config.items()}
+    global_entries = [StaticFile.from_values(config) for config in config.get("_global", [])]
+
+    return {
+        tool_name: global_entries + [StaticFile.from_values(config) for config in config.get(tool_name, [])]
+        for tool_name in target_tools
+    }
 
 
 def _setup_component_configs(c: Connection, tool_name: str):
@@ -443,8 +448,9 @@ def update_network_policies(_ctx):
 @task()
 def update_static_files(_ctx):
     """Execute a static file deployment for a tool account."""
-    static_files = _get_static_files()
-    for tool_name in _get_target_tools():
+    target_tools = _get_target_tools()
+    static_files = _get_static_files(target_tools)
+    for tool_name in target_tools:
         if TARGET_USER is None or tool_name == TARGET_USER:
             c = _get_connection_for_tool(tool_name)
 
