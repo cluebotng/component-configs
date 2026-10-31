@@ -1,5 +1,5 @@
-import base64
 import dataclasses
+import io
 import json
 import os
 import sys
@@ -161,11 +161,9 @@ def _setup_component_configs(c: Connection, tool_name: str):
     with (PosixPath(__name__).parent / f"{tool_name}.yaml").open("r") as fh:
         config = fh.read()
 
-    encoded_config = base64.b64encode(config.encode("utf-8")).decode("utf-8")
-
     c.sudo(
-        f"bash -c 'base64 -d <<<{encoded_config} | "
-        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components config create'",
+        f"XDG_CONFIG_HOME='{TOOL_BASE_DIR / tool_name}' toolforge components config create",
+        in_stream=io.StringIO(config),
     )
 
 
@@ -188,8 +186,7 @@ def _get_deployment_token(c: Connection, tool_name: str):
 
 def _apply_kubernetes_object(c: Connection, k8s_obj: dict[str, Any]) -> bool:
     obj_as_yaml = yaml.dump(k8s_obj)
-    encoded_contents = base64.b64encode(obj_as_yaml.encode("utf-8")).decode("utf-8")
-    ret = c.sudo(f'bash -c "base64 -d <<<{encoded_contents} | kubectl apply -f-"', hide="both")
+    ret = c.sudo("kubectl apply -f-", hide="both", in_stream=io.StringIO(obj_as_yaml))
     if ret.exited != 0:
         print(f"kubectl apply failed: {ret.stdout} / {ret.stderr}")
     return ret.exited == 0
@@ -222,17 +219,13 @@ def _ensure_static_file(c: Connection, tool_name: str, static_file: StaticFile) 
     contents = static_file.load()
     for k, v in static_file.replace.items():
         contents = contents.replace(f"{{{{ {k} }}}}", v)
-    encoded_contents = base64.b64encode(contents.encode("utf-8")).decode("utf-8")
     target_path = TOOL_BASE_DIR / tool_name / static_file.target
 
     print(f"Writing {static_file.source} to {target_path.absolute()} ({static_file.mode})")
     ret = c.sudo(
-        f'bash -c "'
-        f"mkdir -p '{target_path.parent}' &&"
-        f"base64 -d <<<'{encoded_contents}' > '{target_path}' && "
-        f"chmod {static_file.mode} '{target_path}'"
-        f'"',
+        f"bash -c \"install -D -m {static_file.mode} /dev/null '{target_path}' && cat > '{target_path}'\"",
         hide="both",
+        in_stream=io.StringIO(contents),
     )
     if ret.exited != 0:
         print(f"file write failed: {ret.stdout} / {ret.stderr}")
