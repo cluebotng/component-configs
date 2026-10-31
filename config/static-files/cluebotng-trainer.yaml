@@ -1,3 +1,7 @@
 - source: copy-kube-certs-to-env.sh
-  target: copy-kube-certs-to-env
+  target: scripts/copy-kube-certs-to-env
   mode: 750
+
+# Old paths
+- target: copy-kube-certs-to-env
+  remove: true

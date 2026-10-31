@@ -1,3 +1,10 @@
-- source: really-really-complete-a-deploy.sh
-  target: really-really-complete-a-deploy
+- source: retry-components-deployment.sh
+  target: scripts/retry-component-deploy-until-complete
   mode: 750
+
+# Old paths
+- target: really-really-complete-a-deploy
+  remove: true
+
+- target: scripts/really-really-complete-a-deploy
+  remove: true

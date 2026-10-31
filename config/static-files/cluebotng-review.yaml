@@ -1,9 +1,16 @@
 - source: trove-mysql.sh
-  target: trove-mysql
+  target: scripts/trove-mysql
   mode: 750
 
 - source: django-manage.sh
-  target: reviewer-manage
+  target: scripts/reviewer-manage
   mode: 750
   replace:
     COMPONENT_NAME: cluebotng-reviewer
+
+# Old paths
+- target: reviewer-manage
+  remove: true
+
+- target: trove-mysql
+  remove: true
