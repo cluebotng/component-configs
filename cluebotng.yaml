@@ -2,7 +2,6 @@
 defaults:
   alerts:
     notify: true
-
 components:
   # Core services - see utilities repo (until components-api is stable)
   core:
@@ -45,7 +44,7 @@ components:
   reporter-interface:
     build:
       repository: https://github.com/cluebotng/reporter.git
-      ref: refs/tags/v2.1.2
+      ref: refs/tags/v2.1.3
     run:
       command: web
       port: 8000
