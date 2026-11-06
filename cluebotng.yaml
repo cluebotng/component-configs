@@ -44,7 +44,7 @@ components:
   reporter-interface:
     build:
       repository: https://github.com/cluebotng/reporter.git
-      ref: refs/tags/v2.1.11
+      ref: refs/tags/v2.1.12
     run:
       command: web
       port: 8000
