@@ -26,7 +26,7 @@ components:
   redis:
     build:
       repository: https://github.com/cluebotng/external-redis.git
-      ref: refs/tags/v1.4.0
+      ref: refs/tags/v1.5.0
     run:
       command: redis-server
       port: 6379
