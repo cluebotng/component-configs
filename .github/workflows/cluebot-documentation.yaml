@@ -1,0 +1,47 @@
+name: 'cluebot-documentation'
+on: { push: { branches: [ main ], paths: [ 'cluebot-documentation.yaml', 'config/general.yaml', 'config/network-policies/cluebot-documentation.yaml', ] }, workflow_dispatch: { } }
+concurrency:
+  group: cluebot-documentation
+jobs:
+  update-network-policies:
+    uses: ./.github/workflows/execute-fabric.yml
+    with:
+      user: 'cluebot-documentation'
+      task: update-network-policies
+    secrets:
+      ssh_key: ${{ secrets.CI_SSH_KEY }}
+  update-component-config:
+    needs: [update-network-policies]
+    uses: ./.github/workflows/execute-fabric.yml
+    with:
+      user: 'cluebot-documentation'
+      task: update-component-config
+    secrets:
+      ssh_key: ${{ secrets.CI_SSH_KEY }}
+  execute-deployment:
+    needs: [update-network-policies, update-component-config]
+    uses: ./.github/workflows/execute-fabric.yml
+    with:
+      user: 'cluebot-documentation'
+      task: execute-deployment
+    secrets:
+      ssh_key: ${{ secrets.CI_SSH_KEY }}
+  dologmsg-success:
+    needs: [update-network-policies, update-component-config, execute-deployment]
+    uses: ./.github/workflows/execute-fabric.yml
+    with:
+      user: 'cluebot-documentation'
+      task: dologmsg
+      argument: "--message='Deployment completed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'"
+    secrets:
+      ssh_key: ${{ secrets.CI_SSH_KEY }}
+  dologmsg-failure:
+    needs: [update-network-policies, update-component-config, execute-deployment]
+    if: ${{ failure() }}
+    uses: ./.github/workflows/execute-fabric.yml
+    with:
+      user: 'cluebot-documentation'
+      task: dologmsg
+      argument: "--message='Deployment failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (https://github.com/cluebotng/component-configs/commits/${{ github.sha || github.ref }})'"
+    secrets:
+      ssh_key: ${{ secrets.CI_SSH_KEY }}
