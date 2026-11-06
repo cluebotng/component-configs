@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: setup python
-        uses: infrabits/ci-setup-python@9233f26fef5b34b29026b53a08550c8371711536 # v1.1.0
+        uses: infrabits/ci-setup-python@0a2dd968401b001362997490a977f0177a600232 # v1.6.0
         with:
           install_dependencies: true
           install_test_dependencies: false
