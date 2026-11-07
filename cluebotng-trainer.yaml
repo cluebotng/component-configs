@@ -36,7 +36,7 @@ components:
   pushgateway:
     build:
       repository: https://github.com/cluebotng/external-pushgateway.git
-      ref: refs/tags/v0.7.0
+      ref: refs/tags/v0.8.0
     run:
       command: run-pushgateway
       port: 9091
