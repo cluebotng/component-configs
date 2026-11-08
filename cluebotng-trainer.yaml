@@ -51,13 +51,3 @@ components:
       port: 8000
       health_check_http: /health
       mount: all
-  ## Cleanup
-  prune-runs:
-    build:
-      repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v1.13.0
-    run:
-      command: bash -c 'find "/data/project/cluebotng-trainer/public_html" -type f -mtime +7 -delete'
-      schedule: '30 2 * * *'
-      timeout: 3600
-      mount: all
