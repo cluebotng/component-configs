@@ -4,6 +4,7 @@ defaults:
     notify: true
 components:
   coordinator:
+    component_type: scheduled
     build:
       repository: https://github.com/cluebotng/trainer.git
       ref: refs/tags/v2.11.0
@@ -13,6 +14,7 @@ components:
       mount: all
       command: launcher ./deployment/entrypoint.sh run-edit-sets
   file-api:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/fileserver.git
       ref: refs/tags/v2.11.0
@@ -24,6 +26,7 @@ components:
       health_check_http: /_/health
   # Monitoring
   grafana-alloy:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v1.8.0
@@ -33,6 +36,7 @@ components:
       health_check_http: /health
       mount: all
   pushgateway:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-pushgateway.git
       ref: refs/tags/v0.10.0
@@ -42,6 +46,7 @@ components:
       health_check_http: /-/healthy
       mount: all
   monitoring-toolforge:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
       ref: refs/tags/v2.10.0

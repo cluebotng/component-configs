@@ -4,6 +4,7 @@ defaults:
     notify: true
 components:
   core:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-core.git
       ref: refs/tags/v1.14.0
@@ -12,6 +13,7 @@ components:
       port: 3565
       health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
   reporter-interface:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/reporter.git
       ref: refs/tags/v2.8.0
@@ -21,6 +23,7 @@ components:
       publish: /
       health_check_http: internal/health/
   grafana-alloy:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v1.8.0
@@ -30,6 +33,7 @@ components:
       health_check_http: /health
       mount: all
   monitoring-toolforge:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
       ref: refs/tags/v2.10.0
@@ -39,6 +43,7 @@ components:
       health_check_http: /health
       mount: all
   redis:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-redis.git
       ref: refs/tags/v1.10.0

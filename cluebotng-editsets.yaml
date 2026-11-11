@@ -4,6 +4,7 @@ defaults:
     notify: true
 components:
   file-api:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/fileserver.git
       ref: refs/tags/v2.11.0
@@ -16,6 +17,7 @@ components:
       mount: all
   # Monitoring
   grafana-alloy:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v1.8.0
@@ -25,6 +27,7 @@ components:
       health_check_http: /health
       mount: all
   monitoring-toolforge:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
       ref: refs/tags/v2.10.0

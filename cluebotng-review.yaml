@@ -5,6 +5,7 @@ defaults:
 components:
   # Core services
   cluebotng-reviewer:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/reviewer.git
       ref: refs/tags/v2.10.0
@@ -16,6 +17,7 @@ components:
       memory: 2Gi
       health_check_http: /internal/health/
   celery-worker:
+    component_type: continuous
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -24,6 +26,7 @@ components:
       memory: 2Gi
   # Runtime dependencies
   redis:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-redis.git
       ref: refs/tags/v1.10.0
@@ -33,6 +36,7 @@ components:
       mount: all
   # Helper services
   irc-relay:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/irc-relay.git
       ref: refs/tags/v4.9.0
@@ -41,6 +45,7 @@ components:
       port: 9334
       health_check_http: /health
   celery-flower:
+    component_type: continuous
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -49,6 +54,7 @@ components:
       health_check_http: /healthcheck
       replicas: 2
   grafana-alloy:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v1.8.0
@@ -58,6 +64,7 @@ components:
       health_check_http: /health
       mount: all
   pushgateway:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-pushgateway.git
       ref: refs/tags/v0.10.0
@@ -67,6 +74,7 @@ components:
       health_check_http: /-/healthy
       mount: all
   monitoring-toolforge:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
       ref: refs/tags/v2.10.0
@@ -76,6 +84,7 @@ components:
       health_check_http: /health
       mount: all
   core:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-core.git
       ref: refs/tags/v1.14.0
@@ -86,6 +95,7 @@ components:
   # Scheduled jobs
   ## Core jobs
   export-statistics:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -93,6 +103,7 @@ components:
       schedule: 13 9 * * *
       timeout: 3600
   update-edit-classifications:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -101,6 +112,7 @@ components:
       timeout: 3600
   ## Seed jobs
   add-reported-edits:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -109,6 +121,7 @@ components:
       timeout: 3600
   ## Helper jobs
   add-reviews-from-report:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -116,6 +129,7 @@ components:
       schedule: 15 * * * *
       timeout: 3600
   add-reviews-from-huggle:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -124,6 +138,7 @@ components:
       timeout: 3600
   ## Back-fill jobs
   import-training-data:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -131,6 +146,7 @@ components:
       schedule: 15 2 * * *
       timeout: 3600
   mark-edits-as-deleted:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -138,6 +154,7 @@ components:
       schedule: 13 4 * * *
       timeout: 3600
   mark-edits-as-having-data:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -145,6 +162,7 @@ components:
       schedule: 13 3 * * *
       timeout: 3600
   add-dangling-edits-to-group:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -153,6 +171,7 @@ components:
       timeout: 3600
   ## Management jobs
   cleanup-user-records:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -160,6 +179,7 @@ components:
       schedule: 13 1 * * *
       timeout: 3600
   update-user-usernames:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -167,6 +187,7 @@ components:
       schedule: 13 2 * * *
       timeout: 3600
   auto-grant-reviewer-access:
+    component_type: scheduled
     build:
       reuse_from: cluebotng-reviewer
     run:
@@ -175,6 +196,7 @@ components:
       timeout: 3600
   ## Backups
   backup-database:
+    component_type: scheduled
     build:
       repository: https://github.com/cluebotng/external-utilities.git
       ref: refs/tags/v2.1.0
@@ -183,6 +205,7 @@ components:
       schedule: '45 */4 * * *'
       timeout: 10800
   backup-database-daily:
+    component_type: scheduled
     build:
       repository: https://github.com/cluebotng/external-utilities.git
       ref: refs/tags/v2.1.0
@@ -192,6 +215,7 @@ components:
       timeout: 10800
       mount: all
   prune-backups:
+    component_type: scheduled
     build:
       reuse_from: backup-database
     run:

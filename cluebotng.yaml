@@ -5,6 +5,7 @@ defaults:
 components:
   # Core services - see utilities repo (until components-api is stable)
   core:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-core.git
       ref: refs/tags/v1.14.0
@@ -15,6 +16,7 @@ components:
       cpu: '1'
       health_check_script: bash -c 'nc localhost 3565 <<< "<WPEditSet />"'
   bot:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/bot.git
       ref: refs/tags/v6.1.0
@@ -26,6 +28,7 @@ components:
       health_check_script: health-check
   # Supporting services
   redis:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-redis.git
       ref: refs/tags/v1.10.0
@@ -33,6 +36,7 @@ components:
       command: redis-server
       port: 6379
   irc-relay:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/irc-relay.git
       ref: refs/tags/v4.9.0
@@ -42,6 +46,7 @@ components:
       health_check_http: /health
   # Report interface
   reporter-interface:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/reporter.git
       ref: refs/tags/v2.8.0
@@ -52,6 +57,7 @@ components:
       health_check_http: internal/health/
       replicas: 2
   report-review-import:
+    component_type: scheduled
     build:
       reuse_from: reporter-interface
     run:
@@ -59,6 +65,7 @@ components:
       schedule: '5 * * * *'
       timeout: 3600
   report-sync-admin-rights:
+    component_type: scheduled
     build:
       reuse_from: reporter-interface
     run:
@@ -66,6 +73,7 @@ components:
       schedule: '13 * * * *'
       timeout: 3600
   report-send-whitelisted-to-review:
+    component_type: scheduled
     build:
       reuse_from: reporter-interface
     run:
@@ -74,6 +82,7 @@ components:
       timeout: 3600
   # Monitoring
   grafana-alloy:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v1.8.0
@@ -83,6 +92,7 @@ components:
       health_check_http: /health
       mount: all
   pushgateway:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-pushgateway.git
       ref: refs/tags/v0.10.0
@@ -92,6 +102,7 @@ components:
       health_check_http: /-/healthy
       mount: all
   monitoring-toolforge:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
       ref: refs/tags/v2.10.0
@@ -102,6 +113,7 @@ components:
       mount: all
   ## Backups
   backup-database:
+    component_type: scheduled
     build:
       repository: https://github.com/cluebotng/external-utilities.git
       ref: refs/tags/v2.1.0
@@ -111,6 +123,7 @@ components:
       timeout: 10800
       mount: all
   prune-backups:
+    component_type: scheduled
     build:
       reuse_from: backup-database
     run:

@@ -4,6 +4,7 @@ defaults:
     notify: true
 components:
   cluebot3:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/cluebot3.git
       ref: refs/tags/v6.1.0
@@ -14,6 +15,7 @@ components:
       health_check_script: health-check
   # Cleanup
   run-cleanup:
+    component_type: scheduled
     build:
       reuse_from: cluebot3
     run:
@@ -24,6 +26,7 @@ components:
       timeout: 21600 # 6 hours
   # Monitoring
   grafana-alloy:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v1.8.0
@@ -33,6 +36,7 @@ components:
       health_check_http: /health
       mount: all
   monitoring-toolforge:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
       ref: refs/tags/v2.10.0

@@ -1,6 +1,7 @@
 # yaml-language-server: $schema=https://gitlab.wikimedia.org/repos/cloud/toolforge/components-api/-/raw/main/openapi/tool-config-schema.json
 components:
   runner:
+    component_type: continuous
     build:
       repository: https://github.com/DamianZaremba/toolforge-functional-runner.git
       ref: refs/tags/v1.1.4
@@ -9,6 +10,7 @@ components:
       port: 9091
       health_check_http: /
   grafana-alloy:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v1.8.0

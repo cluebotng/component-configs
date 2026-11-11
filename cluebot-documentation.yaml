@@ -4,6 +4,7 @@ defaults:
     notify: true
 components:
   webserver:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/documentation.git
       ref: feature/publish-on-toolforge
@@ -13,6 +14,7 @@ components:
       publish: /
   # Monitoring
   grafana-alloy:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/external-grafana-alloy.git
       ref: refs/tags/v1.8.0
@@ -22,6 +24,7 @@ components:
       health_check_http: /health
       mount: all
   monitoring-toolforge:
+    component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-toolforge.git
       ref: refs/tags/v2.10.0
