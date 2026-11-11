@@ -8,7 +8,7 @@ components:
     component_type: continuous
     build:
       repository: https://github.com/cluebotng/reviewer.git
-      ref: refs/tags/v2.11.0
+      ref: refs/tags/v2.11.1
     run:
       command: web
       port: 8000
