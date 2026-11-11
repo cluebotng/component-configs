@@ -106,7 +106,7 @@ components:
       repository: https://github.com/cluebotng/external-utilities.git
       ref: refs/tags/v2.1.0
     run:
-      command: bash -c 'mkdir -p /data/project/cluebotng/mysql_backups/ && mysqldump --defaults-file=/data/project/cluebotng/replica.my.cnf -h tools-db s52585__cb | gzip -9 > /data/project/cluebotng/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
+      command: scripts/database-to-nfs.py --dump-per-table
       schedule: '45 */2 * * *'
       timeout: 10800
       mount: all
@@ -114,7 +114,7 @@ components:
     build:
       reuse_from: backup-database
     run:
-      command: bash -c 'find "/data/project/cluebotng/mysql_backups" -mtime +7 -delete'
+      command: scripts/prune-nfs-backups.py
       schedule: '30 5 * * *'
       timeout: 3600
       mount: all

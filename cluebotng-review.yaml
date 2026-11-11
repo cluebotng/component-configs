@@ -179,7 +179,7 @@ components:
       repository: https://github.com/cluebotng/external-utilities.git
       ref: refs/tags/v2.1.0
     run:
-      command: scripts/database-to-object-store.py
+      command: scripts/database-to-object-store.py --dump-per-table
       schedule: '45 */4 * * *'
       timeout: 10800
   backup-database-daily:
@@ -187,7 +187,7 @@ components:
       repository: https://github.com/cluebotng/external-utilities.git
       ref: refs/tags/v2.1.0
     run:
-      command: scripts/database-to-nfs.py
+      command: scripts/database-to-nfs.py --dump-per-table
       schedule: '13 1 * * *'
       timeout: 10800
       mount: all
@@ -195,7 +195,7 @@ components:
     build:
       reuse_from: backup-database
     run:
-      command: bash -c 'find "/data/project/cluebotng-review/mysql_backups" -mtime +7 -delete'
+      command: scripts/prune-nfs-backups.py
       schedule: '30 5 * * *'
       timeout: 3600
       mount: all
