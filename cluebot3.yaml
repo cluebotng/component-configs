@@ -7,7 +7,7 @@ components:
     component_type: continuous
     build:
       repository: https://github.com/cluebotng/cluebot3.git
-      ref: refs/tags/v6.2.0
+      ref: refs/tags/v6.3.0
     run:
       command: run-bot
       memory: 1Gi
