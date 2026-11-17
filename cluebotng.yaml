@@ -19,7 +19,7 @@ components:
     component_type: continuous
     build:
       repository: https://github.com/cluebotng/bot.git
-      ref: refs/tags/v6.2.1
+      ref: refs/tags/v6.2.2
     run:
       command: run-cbng
       port: 9095
