@@ -49,7 +49,7 @@ components:
     component_type: continuous
     build:
       repository: https://github.com/cluebotng/reporter.git
-      ref: refs/tags/v2.9.0
+      ref: refs/tags/v2.9.1
     run:
       command: web
       port: 8000
