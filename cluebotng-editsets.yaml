@@ -7,7 +7,7 @@ components:
     component_type: continuous
     build:
       repository: https://github.com/cluebotng/fileserver.git
-      ref: refs/tags/v2.12.1
+      ref: refs/tags/v2.13.0
     run:
       command: run-fileserver
       port: 8000
