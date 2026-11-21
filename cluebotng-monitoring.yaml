@@ -18,7 +18,7 @@ components:
     component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-alertmanager.git
-      ref: refs/tags/v1.13.0
+      ref: refs/tags/v1.13.1
     run:
       command: alertmanager
       port: 9093
