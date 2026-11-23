@@ -7,7 +7,7 @@ components:
     component_type: scheduled
     build:
       repository: https://github.com/cluebotng/repository-syncer.git
-      ref: refs/tags/v1.14.0
+      ref: refs/tags/v1.15.0
     run:
       schedule: '*/15 * * * *'
       timeout: 3600
