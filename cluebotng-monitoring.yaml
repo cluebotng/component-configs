@@ -37,7 +37,7 @@ components:
     component_type: continuous
     build:
       repository: https://github.com/cluebotng/monitoring-grafana.git
-      ref: refs/tags/v1.12.1
+      ref: refs/tags/v1.12.2
     run:
       command: grafana
       port: 3000
