@@ -199,7 +199,7 @@ components:
     component_type: scheduled
     build:
       repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v2.3.0
+      ref: refs/tags/v2.4.0
     run:
       command: scripts/database-to-object-store.py --dump-per-table
       schedule: '45 */4 * * *'
@@ -208,7 +208,7 @@ components:
     component_type: scheduled
     build:
       repository: https://github.com/cluebotng/external-utilities.git
-      ref: refs/tags/v2.3.0
+      ref: refs/tags/v2.4.0
     run:
       command: scripts/database-to-nfs.py --dump-per-table
       schedule: '13 1 * * *'
